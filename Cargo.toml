@@ -5,4 +5,4 @@ version = "0.1.0"
 [dependencies]
 warp = "*"
 tokio = { version = "1", features = [ "full" ] }
-
+rppal = "0.12.0"
