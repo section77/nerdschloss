@@ -5,7 +5,7 @@ version = "0.1.0"
 edition = "2018"
 
 [dependencies]
+motordriver = {path = "../motordriver"}
+tokio = {version = "1", features = ["full"]}
 warp = "*"                                                                               
-motordriver = { path = "../motordriver" }
-tokio = {version = "1", features = [ "full" ]}
-rppal = "0.12"
+
