@@ -9,6 +9,7 @@ use std::{
 };
 
 use std::sync::mpsc;
+use std::sync::mpsc::TryRecvError;
 
 pub enum Direction {
     Open,
@@ -20,9 +21,20 @@ pub fn run_stepper(channel: mpsc::Receiver<Direction>) {
     let mut direction = Gpio::new().unwrap().get(24).unwrap().into_output();
     let mut is_open = false;
     loop {
-        match channel.recv() {
+        let mut msg = match channel.recv() {
+            Ok(m) => m,
             Err(_) => return,
-            Ok(Direction::Open) => {
+        };
+        loop {
+            // consume more events, if there are any
+            msg = match channel.try_recv() {
+                Ok(m) => m,
+                Err(TryRecvError::Empty) => break,
+                Err(TryRecvError::Disconnected) => return,
+            };
+        }
+        match msg {
+            Direction::Open => {
                 if !is_open {
                     #[cfg(feature = "hardware")]
                     {
@@ -39,7 +51,7 @@ pub fn run_stepper(channel: mpsc::Receiver<Direction>) {
                     is_open = true;
                 }
             }
-            Ok(Direction::Close) => {
+            Direction::Close => {
                 if is_open {
                     #[cfg(feature = "hardware")]
                     {
