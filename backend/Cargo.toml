@@ -4,8 +4,11 @@ name = "backend"
 version = "0.1.0"
 edition = "2018"
 
-[dependencies]
-motordriver = {path = "../motordriver"}
-tokio = {version = "1", features = ["full"]}
-warp = "*"                                                                               
+[features]
+default = ["hardware"]
+hardware = ["motordriver/hardware"]
 
+[dependencies]
+motordriver = {path = "../motordriver", default-features=false}
+tokio = {version = "1", features = ["full"]}
+warp = "*"

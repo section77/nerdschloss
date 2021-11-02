@@ -1,3 +1,25 @@
 # nerdschloss
 
 [Wiki](https://wiki.section77.de/de/projekte/nerdschloss/nerdschloss-reloaded)
+
+## Compiling for Rapsberry Pi
+
+When on Raspberry Pi, simply run with default features:
+
+```sh
+cd backend/
+cargo run
+```
+
+This includes the `hardware` feature to control the motor.
+
+## Testing/developing on other machines
+
+To execute on another machine without GPIO pins, compile without the `hardware` feature:
+
+```sh
+cd backend/
+cargo run --no-default-features
+```
+
+A simulated motor will appear, that just shows output for open/close events on stdout and waits 5 seconds for each of these actions.
