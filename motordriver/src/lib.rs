@@ -76,7 +76,7 @@ pub fn run_stepper(channel: mpsc::Receiver<Direction>) {
 fn do_steps() {
     let mut stepper = Gpio::new().unwrap().get(23).unwrap().into_output();
     println!("Start stepper");
-    for _ in 1..279 {
+    for _ in 1..4000 {
         stepper.set_high();
         std::thread::sleep(std::time::Duration::from_millis(5));
         stepper.set_low();
