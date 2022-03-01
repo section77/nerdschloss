@@ -7,13 +7,24 @@
       button {
         cursor: pointer;
       }
+      .block {
+        display: block;
+        width: 100%;
+        border: none;
+        background-color: #000000;
+        color: #FFFFFF;
+        padding: 14px 28px;
+        font-size: 50px;
+        cursor: pointer;
+        text-align: center;
+      }
     </style>
   </head>
   <body>
     <h1>Nerdschloss</h1>
     <p>
-      <button onclick="fetch('/open')">Öffnen</button><br>
-      <button onclick="fetch('/close')">Schließen</button>
+      <button type="button" class="block" onclick="fetch('/open')">Öffnen</button><br>
+      <button type="button" class="block" onclick="fetch('/close')">Schließen</button>
     </p>
   </body>
 </html>
