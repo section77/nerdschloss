@@ -26,5 +26,6 @@ async fn main() {
         .and(warp::fs::file("./static/index.html"))
         .or(warp::path("open").map(move || open(&ch1.lock().unwrap())))
         .or(warp::path("close").map(move || close(&ch2.lock().unwrap())));
+    //warp::serve(routes).run(([127, 0, 0, 1], 8080)).await;
     warp::serve(routes).run(([0, 0, 0, 0], 8080)).await;
 }
