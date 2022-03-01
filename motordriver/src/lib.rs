@@ -36,6 +36,7 @@ pub fn run_stepper(channel: mpsc::Receiver<Direction>) {
         match msg {
             Direction::Open => {
                 if !is_open {
+                    println!("Opening ...");
                     #[cfg(feature = "hardware")]
                     {
                         direction.set_high();
@@ -53,6 +54,7 @@ pub fn run_stepper(channel: mpsc::Receiver<Direction>) {
             }
             Direction::Close => {
                 if is_open {
+                    println!("Closing ...");
                     #[cfg(feature = "hardware")]
                     {
                         direction.set_low();
@@ -76,11 +78,11 @@ pub fn run_stepper(channel: mpsc::Receiver<Direction>) {
 fn do_steps() {
     let mut stepper = Gpio::new().unwrap().get(23).unwrap().into_output();
     println!("Start stepper");
-    for _ in 1..4000 {
+    for _ in 1..32000 {
         stepper.set_high();
-        std::thread::sleep(std::time::Duration::from_millis(5));
+        std::thread::sleep(std::time::Duration::from_micros(100));
         stepper.set_low();
-        std::thread::sleep(std::time::Duration::from_millis(5));
+        std::thread::sleep(std::time::Duration::from_micros(100));
     }
     println!("Stepper done");
 }
