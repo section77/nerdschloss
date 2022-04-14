@@ -2,7 +2,7 @@
 
 [Wiki](https://wiki.section77.de/de/projekte/nerdschloss/nerdschloss-reloaded)
 
-## Compiling for Rapsberry Pi
+## Compiling for Raspberry Pi
 
 When on Raspberry Pi, simply run with default features:
 
