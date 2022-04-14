@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
 
 cd backend/ || exit
-cargo run
+cargo run --release
 
