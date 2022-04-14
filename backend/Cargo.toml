@@ -11,4 +11,4 @@ hardware = ["motordriver/hardware"]
 [dependencies]
 motordriver = {path = "../motordriver", default-features=false}
 tokio = {version = "1", features = ["full"]}
-warp = "*"
+warp = "0.3"

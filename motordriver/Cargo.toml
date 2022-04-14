@@ -9,4 +9,4 @@ default = ["hardware"]
 hardware = ["rppal"]
 
 [dependencies]
-rppal = {version = "0.12", optional=true}
+rppal = {version = "0.13", optional=true}
