@@ -77,12 +77,18 @@ pub fn run_stepper(channel: mpsc::Receiver<Direction>) {
 #[cfg(feature = "hardware")]
 fn do_steps() {
     let mut stepper = Gpio::new().unwrap().get(23).unwrap().into_output();
+
+    const STEPPS: i64 = 32000;
+    const PWM_SLEEP_TIME: u64 = 100;
+
     println!("Start stepper");
-    for _ in 1..32000 {
+
+    for _ in 1..STEPPS {
         stepper.set_high();
-        std::thread::sleep(std::time::Duration::from_micros(100));
+        std::thread::sleep(std::time::Duration::from_micros(PWM_SLEEP_TIME));
         stepper.set_low();
-        std::thread::sleep(std::time::Duration::from_micros(100));
+        std::thread::sleep(std::time::Duration::from_micros(PWM_SLEEP_TIME));
     }
+
     println!("Stepper done");
 }
