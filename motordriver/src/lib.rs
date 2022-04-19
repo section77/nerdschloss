@@ -19,7 +19,7 @@ pub enum Direction {
 pub fn run_stepper(channel: mpsc::Receiver<Direction>) {
     #[cfg(feature = "hardware")]
     let mut direction = Gpio::new().unwrap().get(24).unwrap().into_output();
-    let mut stepper_driver = Gpio::new().unwrap().get(25).unwrap().into_output();
+
     let mut is_open = false;
     loop {
         let mut msg = match channel.recv() {
@@ -41,9 +41,7 @@ pub fn run_stepper(channel: mpsc::Receiver<Direction>) {
                     #[cfg(feature = "hardware")]
                     {
                         direction.set_high();
-                        stepper_driver.set_high();
                         do_steps();
-                        stepper_driver.set_low();
                     }
                     #[cfg(not(feature = "hardware"))]
                     {
@@ -61,9 +59,7 @@ pub fn run_stepper(channel: mpsc::Receiver<Direction>) {
                     #[cfg(feature = "hardware")]
                     {
                         direction.set_low();
-                        stepper_driver.set_high();
                         do_steps();
-                        stepper_driver.set_low();
                     }
                     #[cfg(not(feature = "hardware"))]
                     {
@@ -82,11 +78,14 @@ pub fn run_stepper(channel: mpsc::Receiver<Direction>) {
 #[cfg(feature = "hardware")]
 fn do_steps() {
     let mut stepper = Gpio::new().unwrap().get(23).unwrap().into_output();
+    let mut stepper_driver = Gpio::new().unwrap().get(25).unwrap().into_output();
 
     const STEPPS: i64 = 32000;
     const PWM_SLEEP_TIME: u64 = 100;
 
     println!("Start stepper");
+
+    stepper_driver.set_high();
 
     for _ in 1..STEPPS {
         stepper.set_high();
@@ -94,6 +93,8 @@ fn do_steps() {
         stepper.set_low();
         std::thread::sleep(std::time::Duration::from_micros(PWM_SLEEP_TIME));
     }
+
+    stepper_driver.set_low();
 
     println!("Stepper done");
 }
