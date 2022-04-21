@@ -85,7 +85,7 @@ fn do_steps() {
 
     println!("Start stepper");
 
-    stepper_driver.set_high();
+    stepper_driver.set_low();
 
     for _ in 1..STEPPS {
         stepper.set_high();
@@ -94,7 +94,7 @@ fn do_steps() {
         std::thread::sleep(std::time::Duration::from_micros(PWM_SLEEP_TIME));
     }
 
-    stepper_driver.set_low();
+    stepper_driver.set_high();
 
     println!("Stepper done");
 }
