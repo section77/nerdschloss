@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        />
+
+        <title>reveal.js</title>
+
+        <link rel="stylesheet" href="dist/reset.css" />
+        <link rel="stylesheet" href="dist/reveal.css" />
+        <link rel="stylesheet" href="dist/theme/night.css" />
+
+        <!-- Theme used for syntax highlighted code -->
+        <link rel="stylesheet" href="plugin/highlight/monokai.css" />
+    </head>
+    <body>
+        <div class="reveal">
+            <div class="slides">
+                <section>
+                    <h1>nerdschloss</h1>
+                    <br />
+                    <h4>Elektronisches Türschloss Marke Eigenbau</h4>
+                    <p>
+                        <small
+                            >Wie section77 e. V. ein selbst entwickeltes
+                            Türschloss gebaut hat
+                        </small>
+                    </p>
+                </section>
+                <section>
+                    <h2>Florian Bruder</h2>
+                    <p>Embedded-/Windows-Softwareentwickler</p>
+                    <p><small>Prüfsysteme/Messtechnik</small></p>
+                </section>
+                <section>
+                    <h2>Um was geht es</h2>
+                    <div>
+                        <p>section77 e. V.</p>
+                        <p>Nerdschloss - Die Idee</p>
+                        <p>Hardware</p>
+                        <p>Software</p>
+                        <p>Demo</p>
+                        <p>Erweiterungen/Verbesserungen</p>
+                        <p>Fragen?</p>
+                    </div>
+                </section>
+                <section>
+                    <section>
+                        <h2>section77 e. V.</h2>
+                        <p>
+                            <a href="https://section77.de"
+                                >https://section77.de/</a
+                            >
+                        </p>
+                        <p>
+                            <small>Gründung 2014</small>
+                        </p>
+                    </section>
+                    <section>
+                        <img
+                            src="./media/gleis0_1.jpg"
+                            alt="reveal.js logo"
+                            style="height: 500px; margin: auto"
+                        />
+                        <p>Seit 2020 Nerdheim direkt im Bahnhof Offenburg</p>
+                    </section>
+                    <section>
+                        <div class="r-hstack">
+                            <img
+                                src="./media/gleis0_2.jpg"
+                                alt="Nerdheim picture"
+                                style="height: 800px; margin: 0 2rem 0 0"
+                            />
+                            <ul>
+                                <li>CCC-Ableger (Chaostreff, mit ICE Halt)</li>
+                                <li>
+                                    28.05.2022 Tag der offenen Tür (0b1000
+                                    Geburtstag)
+                                </li>
+                            </ul>
+                        </div>
+                    </section>
+                    <section>
+                        <img
+                            src="./media/gleis0_3.jpg"
+                            alt="Nerdheim picture"
+                            style="height: 500px; margin: auto"
+                        />
+                        <p>Lokaler Makerspace/Mitmachwerkstatt</p>
+                    </section>
+                    <section>
+                        <h3>Treffen/Events</h3>
+                        <ul>
+                            <li>
+                                Chaostreff (ungerade Dienstage, also ca. alle 2
+                                Wochen)
+                            </li>
+                            <li>Tech-Event (1. Samstag im Monat)</li>
+                            <li>
+                                3D-Drucker Stammtisch (3. Donnerstag im Monat)
+                            </li>
+                        </ul>
+                    </section>
+                </section>
+                <section>
+                    <h2>Die Idee</h2>
+                    <p>
+                        Schlüsselloser Zugang zum Nerdheim für Vereinsmitglieder
+                    </p>
+                </section>
+                <section>
+                    <section>
+                        <h2>Hardware</h2>
+                        <p>entworfen mit FreeCAD</p>
+                    </section>
+                    <section>
+                        <img
+                            src="./media/cad1.jpeg"
+                            alt="cad"
+                            style="height: 500px; margin: auto"
+                        />
+                        <p>Schlüsselgriff</p>
+                    </section>
+                    <section>
+                        <img
+                            src="./media/cad2.jpeg"
+                            alt="cad"
+                            style="height: 500px; margin: auto"
+                        />
+                        <p>Innenleben</p>
+                    </section>
+                    <section>
+                        <img
+                            src="./media/cad3.jpeg"
+                            alt="cad"
+                            style="height: 500px; margin: auto"
+                        />
+                        <p>mit eingesetztem Schrittmotor</p>
+                    </section>
+                    <section>
+                        <h3>Raspberry PI</h3>
+                        <img
+                            src="./media/raspberrypi.png"
+                            alt="Raspberry PI"
+                            style="height: 400px; margin: auto"
+                        />
+                    </section>
+                    <section>
+                        <h3>Schrittmotor</h3>
+                        <img
+                            src="./media/NEMA17.jpeg"
+                            alt="Schrittmotor"
+                            style="height: 400px; margin: auto"
+                        />
+                        <p>NEMA17</p>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Software</h2>
+                        <p>Rust Anwendung + Nginx</p>
+                        <a href="https://github.com/section77/nerdschloss">
+                            https://github.com/section77/nerdschloss
+                        </a>
+                    </section>
+                    <section>
+                        <h3>Rust</h3>
+                        <a href="https://www.rust-lang.org">
+                            https://www.rust-lang.org
+                        </a>
+                        <ul>
+                            <li>Entwicklung seit 2010</li>
+                            <li>bei Mozilla Research</li>
+                            <li>Kein Garbage Collector</li>
+                            <li>Änlich schnell wie C/C++</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>Rust Foundation</h3>
+                        <img
+                            src="./media/rust_foundation.png"
+                            alt="Rust Foundation"
+                            style="height: 400px; margin: auto"
+                        />
+                    </section>
+                    <section>
+                        <h3>Rust Anwendung</h3>
+                        <ul>
+                            <li>In Rust entwickelte Web-Anwendung</li>
+                            <ul>
+                                <li>warp als Webserver-Framework</li>
+                                <li>rppal um die GPIOs des Pi anzusteuern</li>
+                            </ul>
+                        </ul>
+                    </section>
+                    <section>
+                        <img
+                            src="./media/nerdschloss_screenshot.png"
+                            alt="Benutzer Web-Oberfläche"
+                            style="height: 400px; margin: auto"
+                        />
+                        <p>Webbenuzeroberfläche</p>
+                    </section>
+                    <section>
+                        <p>nerdschloss/backend/src/main.rs</p>
+                        <pre data-id="code-animation">
+                            <code class="hljs" data-trim data-line-numbers="|1-4|6-7|19-30|21-23|24|25-28|29|9-12|14-17">
+                                <script type="text/template">
+use std::sync::mpsc;
+use std::sync::Arc;
+use std::sync::Mutex;
+use warp::Filter;
+
+use motordriver::run_stepper;
+use motordriver::Direction;
+
+fn open(channel: &mpsc::Sender<Direction>) -> String {
+    channel.send(Direction::Open).unwrap();
+    "\"success\"".to_string()
+}
+
+fn close(channel: &mpsc::Sender<Direction>) -> String {
+    channel.send(Direction::Close).unwrap();
+    "\"success\"".to_string()
+}
+
+#[tokio::main]
+async fn main() {
+    let (sender, receiver) = mpsc::channel();
+    let ch1 = Arc::new(Mutex::new(sender.clone()));
+    let ch2 = Arc::new(Mutex::new(sender));
+    std::thread::spawn(|| run_stepper(receiver));
+    let routes = warp::path::end()
+        .and(warp::fs::file("./static/index.html"))
+        .or(warp::path("open").map(move || open(&ch1.lock().unwrap())))
+        .or(warp::path("close").map(move || close(&ch2.lock().unwrap())));
+    warp::serve(routes).run(([127, 0, 0, 1], 8080)).await;
+}
+                                </script>
+                            </code>
+                        </pre>
+                    </section>
+                    <section>
+                        <p>nerdschloss/motordriver/src/lib.rs</p>
+                        <pre data-id="code-animation">
+                            <code class="hljs" data-trim data-line-numbers="|14-17|25-27|37-55|79-99|80-81|83-84|90-95">
+                                <script type="text/template">
+#[cfg(feature = "hardware")]
+use rppal::gpio::Gpio;
+
+#[cfg(not(feature = "hardware"))]
+use std::{
+    io::{self, Write},
+    thread,
+    time::Duration,
+};
+
+use std::sync::mpsc;
+use std::sync::mpsc::TryRecvError;
+
+pub enum Direction {
+    Open,
+    Close,
+}
+
+pub fn run_stepper(channel: mpsc::Receiver<Direction>) {
+    #[cfg(feature = "hardware")]
+    let mut direction = Gpio::new().unwrap().get(24).unwrap().into_output();
+
+    let mut is_open = false;
+    loop {
+        let mut msg = match channel.recv() {
+            Ok(m) => m,
+            Err(_) => return,
+        };
+        loop {
+            // consume more events, if there are any
+            msg = match channel.try_recv() {
+                Ok(m) => m,
+                Err(TryRecvError::Empty) => break,
+                Err(TryRecvError::Disconnected) => return,
+            };
+        }
+        match msg {
+            Direction::Open => {
+                if !is_open {
+                    println!("Opening ...");
+                    #[cfg(feature = "hardware")]
+                    {
+                        direction.set_high();
+                        do_steps();
+                    }
+                    #[cfg(not(feature = "hardware"))]
+                    {
+                        print!("Simulated motor opens the door ...");
+                        io::stdout().flush().unwrap();
+                        thread::sleep(Duration::from_secs(5));
+                        println!(" open!");
+                    }
+                    is_open = true;
+                }
+            }
+            Direction::Close => {
+                if is_open {
+                    println!("Closing ...");
+                    #[cfg(feature = "hardware")]
+                    {
+                        direction.set_low();
+                        do_steps();
+                    }
+                    #[cfg(not(feature = "hardware"))]
+                    {
+                        print!("Simulated motor closes the door ...");
+                        io::stdout().flush().unwrap();
+                        thread::sleep(Duration::from_secs(5));
+                        println!(" closed!");
+                    }
+                    is_open = false;
+                }
+            }
+        }
+    }
+}
+
+#[cfg(feature = "hardware")]
+fn do_steps() {
+    let mut stepper = Gpio::new().unwrap().get(23).unwrap().into_output();
+    let mut stepper_driver = Gpio::new().unwrap().get(25).unwrap().into_output();
+
+    const STEPPS: i64 = 32000;
+    const PWM_SLEEP_TIME: u64 = 100;
+
+    println!("Start stepper");
+
+    stepper_driver.set_low();
+
+    for _ in 1..STEPPS {
+        stepper.set_high();
+        std::thread::sleep(std::time::Duration::from_micros(PWM_SLEEP_TIME));
+        stepper.set_low();
+        std::thread::sleep(std::time::Duration::from_micros(PWM_SLEEP_TIME));
+    }
+
+    stepper_driver.set_high();
+
+    println!("Stepper done");
+}
+                                </script>
+                            </code>
+                        </pre>
+                    </section>
+                    <section>
+                        <h3>Nginx Konfiguration</h3>
+                        <p>Nginx als Reverseproxy Server</p>
+                    </section>
+                    <section data-auto-animate>
+                        <pre data-id="code-animation">
+                            <code class="hljs" data-trim data-line-numbers="|2-3,5|6-8|22-23|26">
+                                <script type="text/template">
+server {
+    listen        443;
+    ssl on;
+    server_name door.section77.de;
+    proxy_ssl_server_name on;
+    ssl_certificate      /etc/nginx/certificates/door.section77.de.crt; ## Use your own trusted certificate from CA/SSLTrust
+    ssl_certificate_key /etc/nginx/certificates/door.section77.de.key; ## Use your own trusted certificate from CA/SSLTrust
+    ssl_client_certificate /etc/nginx/certificates/ca.crt; ## Use your own trusted certificate from CA/SSLTrust
+
+#    ssl_verify_client on;
+
+    ## You can optionally capture the error code and redirect it to a custom page
+    ## error_page 495 496 497 https://someerrorpage.yourdomain.com;
+
+    ssl_prefer_server_ciphers on;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers 'ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:kEDH+AESGCM:E
+CDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECD
+HE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:AES128-GCM-SHA256:AES25
+6-GCM-SHA384:ECDHE-RSA-RC4-SHA:ECDHE-ECDSA-RC4-SHA:RC4-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!3DES:!MD5:!PSK';
+
+    keepalive_timeout 10;
+    ssl_session_timeout 5m;
+
+location / {
+    proxy_pass http://localhost:8080;
+#    // optionally you may want to look into the proxy_pass_reverse directive as well.
+  }
+}
+								</script>
+                            </code>
+                        </pre>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Demo</h2>
+                    </section>
+                    <section>
+                        <img
+                            src="./media/nerdschloss.jpg"
+                            alt="Schloss"
+                            style="height: 400px; margin: auto"
+                        />
+                    </section>
+                    <section>
+                        <video controls>
+                            <source
+                                data-src="./media/nerdschloss.mp4"
+                                type="video/mp4"
+                            />
+                        </video>
+                    </section>
+                </section>
+                <section>
+                    <h2>Erweiterungen/ Verbesserungen</h2>
+                    <ul>
+                        <li>Hardware</li>
+                        <ul>
+                            <li>Endpositionerkennung</li>
+                        </ul>
+                        <li>Software</li>
+                        <ul>
+                            <li>CI Cross-Build</li>
+                            <li>deb Package zum installieren via apt</li>
+                            <li>Animierte UI</li>
+                        </ul>
+                    </ul>
+                </section>
+                <section>
+                    <h2>Fragen?</h2>
+                    <ul>
+                        <li>
+                            28.05.2022 Tag der offenen Tür (0b1000 Geburtstag)
+                        </li>
+                        <li>
+                            <a href="https://section77.de/"
+                                >https://section77.de/</a
+                            >
+                        </li>
+                        <li>
+                            <a href="https://chat.section77.de/"
+                                >Mattermost-Chat-Server
+                                https://chat.section77.de/</a
+                            >
+                        </li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+
+        <script src="dist/reveal.js"></script>
+        <script src="plugin/notes/notes.js"></script>
+        <script src="plugin/markdown/markdown.js"></script>
+        <script src="plugin/highlight/highlight.js"></script>
+        <script>
+            // More info about initialization & config:
+            // - https://revealjs.com/initialization/
+            // - https://revealjs.com/config/
+            Reveal.initialize({
+                hash: true,
+
+                // Learn about plugins: https://revealjs.com/plugins/
+                plugins: [RevealMarkdown, RevealHighlight, RevealNotes],
+            });
+        </script>
+    </body>
+</html>
