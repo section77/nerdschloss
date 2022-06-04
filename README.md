@@ -2,12 +2,19 @@
 
 [Wiki](https://wiki.section77.de/de/projekte/nerdschloss/nerdschloss-reloaded)
 
+## Preparation
+
+Install rust:
+
+```(hm - wie machen wir das in schön?)
+```
+
 ## Compiling for Raspberry Pi
 
 When on Raspberry Pi, simply run with default features:
 
 ```sh
-cd backend/
+cd software/backend/
 cargo run
 ```
 
