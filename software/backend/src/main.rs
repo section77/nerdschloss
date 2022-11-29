@@ -1,10 +1,9 @@
 use std::sync::mpsc;
 use std::sync::Arc;
 use std::sync::Mutex;
-use warp::Filter;
 
-use motordriver::run_stepper;
-use motordriver::Direction;
+use motordriver::{run_stepper, Direction};
+use warp::Filter;
 
 fn open(channel: &mpsc::Sender<Direction>) -> String {
     channel.send(Direction::Open).unwrap();
