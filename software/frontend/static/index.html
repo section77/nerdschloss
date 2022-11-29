@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Nerdschloss</title>
+        <style>
+            button {
+                cursor: pointer;
+            }
+            .open {
+                display: block;
+                width: 100%;
+                border: none;
+                background-color: #ffffff;
+                border-spacing: 140px;
+                color: #000000;
+                padding: 280px 140px;
+                font-size: 50px;
+                cursor: pointer;
+                text-align: center;
+            }
+            .close {
+                display: block;
+                width: 100%;
+                border: none;
+                background-color: #000000;
+                border-spacing: 140px;
+                color: #ffffff;
+                padding: 280px 140px;
+                font-size: 50px;
+                cursor: pointer;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Nerdschloss</h1>
+        <p>
+            <button type="button" class="open" onclick="fetch('/open')">
+                Öffnen
+            </button>
+            <br />
+            <button type="button" class="close" onclick="fetch('/close')">
+                Schließen
+            </button>
+        </p>
+    </body>
+</html>

@@ -22,7 +22,7 @@ async fn main() {
     let ch2 = Arc::new(Mutex::new(sender));
     std::thread::spawn(|| run_stepper(receiver));
     let routes = warp::path::end()
-        .and(warp::fs::file("./static/index.html"))
+        .and(warp::fs::file("./frontend/static/index.html"))
         .or(warp::path("open").map(move || open(&ch1.lock().unwrap())))
         .or(warp::path("close").map(move || close(&ch2.lock().unwrap())));
     warp::serve(routes).run(([127, 0, 0, 1], 8080)).await;
