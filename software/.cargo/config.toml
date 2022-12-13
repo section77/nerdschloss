@@ -1,0 +1,20 @@
+[build]
+#target = "arm-unknown-linux-musleabihf"
+#target = "armv7-unknown-linux-musleabihf"
+#target = "aarch64-unknown-linux-musl"
+
+[target.arm-unknown-linux-musleabihf]
+linker = "arm-linux-gnueabihf-ld"
+ar = "arm-linux-gnueabihf-ar"
+rustflags = "-C target-cpu=arm1176jzf-s"
+
+[target.armv7-unknown-linux-musleabihf]
+linker = "arm-linux-gnueabihf-ld"
+ar = "arm-linux-gnueabihf-ar"
+rustflags = "-C target-cpu=cortex-a72"
+
+[target.aarch64-unknown-linux-musl]
+linker = "aarch64-elf-ld"
+ar = "aarch64-elf-ar"
+rustflags = "-C target-cpu=cortex-a72"
+
