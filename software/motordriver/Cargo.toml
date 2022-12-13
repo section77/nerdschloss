@@ -5,8 +5,12 @@ version = "0.1.0"
 edition = "2021"
 
 [features]
-default = ["hardware"]
+default = []
 hardware = ["rppal"]
 
 [dependencies]
-rppal = {version = "0.13", optional=true}
+log = "0.4"
+anyhow = "1"
+thiserror = "1"
+rppal = {version = "0.13", optional = true}
+

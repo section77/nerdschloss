@@ -5,10 +5,15 @@ version = "0.1.0"
 edition = "2021"
 
 [features]
-default = ["hardware"]
+default = []
 hardware = ["motordriver/hardware"]
 
 [dependencies]
-motordriver = {path = "../motordriver", default-features=false}
+motordriver = {path = "../motordriver"}#, default-features=false}
+dotenvy = "0.15"
+log = "0.4"
+anyhow = "1"
+thiserror = "1"
 tokio = {version = "1", features = ["full"]}
 warp = "0.3"
+
