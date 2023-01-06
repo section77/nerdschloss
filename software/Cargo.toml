@@ -1,6 +1,7 @@
 [workspace]
 members = [
-	"motordriver",
 	"backend",
+	"hardware",
+	"motordriver",
 ]
 
