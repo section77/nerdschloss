@@ -9,7 +9,7 @@ async fn main() -> anyhow::Result<(), anyhow::Error> {
 
     // Serve the application
     let server = Server::new(listener);
-    let route = setup().await?;
+    let route = setup()?;
     server.run(route).await?;
     Ok(())
 }

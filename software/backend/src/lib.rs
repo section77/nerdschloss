@@ -12,7 +12,8 @@ use tokio::sync::mpsc::channel;
 #[folder = "../frontend/static/"]
 struct StaticFiles;
 
-pub async fn setup() -> anyhow::Result<Route, anyhow::Error> {
+pub fn setup() -> anyhow::Result<Route, anyhow::Error> {
+    // Create channel
     let (sender, receiver) = channel(1);
 
     // Start logic stuff
