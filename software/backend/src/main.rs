@@ -6,6 +6,7 @@ use poem::{
 };
 use tokio::sync::mpsc::{channel, Sender};
 
+// Setup embedded files
 #[derive(rust_embed::RustEmbed)]
 #[folder = "../frontend/static/"]
 struct StaticFiles;
@@ -33,17 +34,23 @@ async fn close(channel: Data<&Sender<Direction>>) -> impl IntoResponse {
 #[tokio::main]
 async fn main() -> anyhow::Result<(), anyhow::Error> {
     let (sender, receiver) = channel(1);
+
+    // Start logic stuff
     let _ = tokio::task::spawn_blocking(|| {
         run_stepper(receiver);
     });
 
+    // Setup the routs
     let app = Route::new()
         .at("/", EmbeddedFileEndpoint::<StaticFiles>::new("index.html"))
         .at("/state", get(state))
         .at("/open", get(open).data(sender.clone()))
         .at("/close", get(close).data(sender));
 
+    // Listen for new connections
     let listener = TcpListener::bind("127.0.0.1:8080");
+
+    // Serve the application
     let server = Server::new(listener);
     server.run(app).await?;
     Ok(())
