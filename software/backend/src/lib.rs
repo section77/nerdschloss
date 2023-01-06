@@ -1,35 +1,16 @@
-use motordriver::{run_stepper, Direction};
+mod handlers;
 
-use poem::{
-    endpoint::EmbeddedFileEndpoint, get, handler, web::Data, EndpointExt, IntoResponse, Route,
-};
+use handlers::{close, open, state};
 
-use tokio::sync::mpsc::{channel, Sender};
+use motordriver::run_stepper;
+
+use poem::{endpoint::EmbeddedFileEndpoint, get, EndpointExt, Route};
+use tokio::sync::mpsc::channel;
 
 // Setup embedded files
 #[derive(rust_embed::RustEmbed)]
 #[folder = "../frontend/static/"]
 struct StaticFiles;
-
-#[handler]
-async fn state() -> impl IntoResponse {
-    #[cfg(debug_assertions)]
-    dbg!("state");
-}
-
-#[handler]
-async fn open(channel: Data<&Sender<Direction>>) -> impl IntoResponse {
-    #[cfg(debug_assertions)]
-    dbg!("open");
-    channel.0.send(Direction::Open).await.unwrap();
-}
-
-#[handler]
-async fn close(channel: Data<&Sender<Direction>>) -> impl IntoResponse {
-    #[cfg(debug_assertions)]
-    dbg!("close");
-    channel.0.send(Direction::Close).await.unwrap();
-}
 
 pub async fn setup() -> anyhow::Result<Route, anyhow::Error> {
     let (sender, receiver) = channel(1);
