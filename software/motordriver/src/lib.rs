@@ -1,6 +1,3 @@
-#[cfg(feature = "hardware")]
-use rppal::gpio::Gpio;
-
 #[cfg(not(feature = "hardware"))]
 use std::{
     io::{self, Write},
@@ -8,32 +5,26 @@ use std::{
     time::Duration,
 };
 
-use std::sync::mpsc;
-use std::sync::mpsc::TryRecvError;
+#[cfg(feature = "hardware")]
+use rppal::gpio::Gpio;
+use tokio::sync::mpsc::Receiver;
 
+#[derive(Debug)]
 pub enum Direction {
     Open,
     Close,
 }
 
-pub fn run_stepper(channel: mpsc::Receiver<Direction>) {
+pub fn run_stepper(mut receiver: Receiver<Direction>) {
     #[cfg(feature = "hardware")]
     let mut direction = Gpio::new().unwrap().get(24).unwrap().into_output();
 
     let mut is_open = false;
     loop {
-        let mut msg = match channel.recv() {
-            Ok(m) => m,
-            Err(_) => return,
+        let msg = match receiver.blocking_recv() {
+            Some(m) => m,
+            None => return,
         };
-        loop {
-            // consume more events, if there are any
-            msg = match channel.try_recv() {
-                Ok(m) => m,
-                Err(TryRecvError::Empty) => break,
-                Err(TryRecvError::Disconnected) => return,
-            };
-        }
         match msg {
             Direction::Open => {
                 if !is_open {
