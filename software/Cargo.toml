@@ -2,6 +2,5 @@
 members = [
 	"backend",
 	"hardware",
-	"motordriver",
 ]
 

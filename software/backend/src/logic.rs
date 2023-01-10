@@ -1,0 +1,65 @@
+#[cfg(any(
+    target = "arm-unknown-linux-musleabihf",
+    target = "armv7-unknown-linux-musleabihf",
+    target = "aarch64-unknown-linux-musl"
+))]
+use hardware::do_steps;
+use hardware::Direction;
+
+use std::{
+    io::{self, Write},
+    thread,
+    time::Duration,
+};
+
+use tokio::sync::mpsc::Receiver;
+
+pub fn run_stepper(mut receiver: Receiver<Direction>) {
+    let mut is_open = false;
+    loop {
+        let msg = match receiver.blocking_recv() {
+            Some(m) => m,
+            None => return,
+        };
+        match msg {
+            Direction::Open => {
+                if !is_open {
+                    println!("Opening ...");
+                    #[cfg(any(
+                        target = "arm-unknown-linux-musleabihf",
+                        target = "armv7-unknown-linux-musleabihf",
+                        target = "aarch64-unknown-linux-musl"
+                    ))]
+                    do_steps(msg);
+                    #[cfg(not(feature = "hardware"))]
+                    {
+                        print!("Simulated motor opens the door ...");
+                        io::stdout().flush().unwrap();
+                        thread::sleep(Duration::from_secs(5));
+                        println!(" open!");
+                    }
+                    is_open = true;
+                }
+            }
+            Direction::Close => {
+                if is_open {
+                    println!("Closing ...");
+                    #[cfg(any(
+                        target = "arm-unknown-linux-musleabihf",
+                        target = "armv7-unknown-linux-musleabihf",
+                        target = "aarch64-unknown-linux-musl"
+                    ))]
+                    do_steps(msg);
+                    #[cfg(not(feature = "hardware"))]
+                    {
+                        print!("Simulated motor closes the door ...");
+                        io::stdout().flush().unwrap();
+                        thread::sleep(Duration::from_secs(5));
+                        println!(" closed!");
+                    }
+                    is_open = false;
+                }
+            }
+        }
+    }
+}

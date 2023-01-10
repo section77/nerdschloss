@@ -40,8 +40,8 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "dotenvy",
+ "hardware",
  "log",
- "motordriver",
  "poem",
  "rust-embed",
  "thiserror",
@@ -399,17 +399,6 @@ dependencies = [
  "log",
  "wasi",
  "windows-sys",
-]
-
-[[package]]
-name = "motordriver"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "log",
- "rppal",
- "thiserror",
- "tokio",
 ]
 
 [[package]]

@@ -1,8 +1,8 @@
 mod handlers;
+mod logic;
 
-use handlers::{close, open, state};
-
-use motordriver::run_stepper;
+use self::handlers::{close, open, state};
+use self::logic::run_stepper;
 
 use poem::{endpoint::EmbeddedFileEndpoint, get, EndpointExt, Route};
 use tokio::sync::mpsc::channel;

@@ -4,12 +4,8 @@ name = "backend"
 version = "0.1.0"
 edition = "2021"
 
-[features]
-default = []
-hardware = ["motordriver/hardware"]
-
 [dependencies]
-motordriver = {path = "../motordriver"}#, default-features=false}
+hardware = {path = "../hardware"}
 dotenvy = "0.15"
 log = "0.4"
 anyhow = "1"

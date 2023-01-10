@@ -1,4 +1,4 @@
-use motordriver::Direction;
+use hardware::Direction;
 
 use poem::{handler, web::Data, IntoResponse};
 use tokio::sync::mpsc::Sender;

@@ -1,4 +1,4 @@
-use backend::setup;
+use ::backend::setup;
 
 use poem::{listener::TcpListener, Server};
 
