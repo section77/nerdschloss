@@ -19,7 +19,7 @@ pub fn run_stepper(mut receiver: Receiver<Direction>) {
     loop {
         let msg = match receiver.blocking_recv() {
             Some(m) => m,
-            None => return,
+            None => continue,
         };
         match msg {
             Direction::Open => {
@@ -31,7 +31,11 @@ pub fn run_stepper(mut receiver: Receiver<Direction>) {
                         target = "aarch64-unknown-linux-musl"
                     ))]
                     do_steps(msg);
-                    #[cfg(not(feature = "hardware"))]
+                    #[cfg(not(any(
+                        target = "arm-unknown-linux-musleabihf",
+                        target = "armv7-unknown-linux-musleabihf",
+                        target = "aarch64-unknown-linux-musl"
+                    )))]
                     {
                         print!("Simulated motor opens the door ...");
                         io::stdout().flush().unwrap();
@@ -50,7 +54,11 @@ pub fn run_stepper(mut receiver: Receiver<Direction>) {
                         target = "aarch64-unknown-linux-musl"
                     ))]
                     do_steps(msg);
-                    #[cfg(not(feature = "hardware"))]
+                    #[cfg(not(any(
+                        target = "arm-unknown-linux-musleabihf",
+                        target = "armv7-unknown-linux-musleabihf",
+                        target = "aarch64-unknown-linux-musl"
+                    )))]
                     {
                         print!("Simulated motor closes the door ...");
                         io::stdout().flush().unwrap();
