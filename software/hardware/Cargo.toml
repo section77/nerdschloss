@@ -7,3 +7,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+anyhow = "1"
+thiserror = "1"
+
+[target.'cfg(any(target = "arm-unknown-linux-musleabihf", target = "armv7-unknown-linux-musleabihf", target = "aarch64-unknown-linux-musl"))'.dependencies]
+rppal = {version = "0.14", optional = true}
+
