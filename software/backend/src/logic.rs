@@ -1,8 +1,3 @@
-#[cfg(any(
-    target = "arm-unknown-linux-musleabihf",
-    target = "armv7-unknown-linux-musleabihf",
-    target = "aarch64-unknown-linux-musl"
-))]
 use hardware::do_steps;
 use hardware::Direction;
 
@@ -25,17 +20,7 @@ pub fn run_stepper(mut receiver: Receiver<Direction>) {
             Direction::Open => {
                 if !is_open {
                     println!("Opening ...");
-                    #[cfg(any(
-                        target = "arm-unknown-linux-musleabihf",
-                        target = "armv7-unknown-linux-musleabihf",
-                        target = "aarch64-unknown-linux-musl"
-                    ))]
                     do_steps(msg);
-                    #[cfg(not(any(
-                        target = "arm-unknown-linux-musleabihf",
-                        target = "armv7-unknown-linux-musleabihf",
-                        target = "aarch64-unknown-linux-musl"
-                    )))]
                     {
                         print!("Simulated motor opens the door ...");
                         io::stdout().flush().unwrap();
@@ -48,17 +33,7 @@ pub fn run_stepper(mut receiver: Receiver<Direction>) {
             Direction::Close => {
                 if is_open {
                     println!("Closing ...");
-                    #[cfg(any(
-                        target = "arm-unknown-linux-musleabihf",
-                        target = "armv7-unknown-linux-musleabihf",
-                        target = "aarch64-unknown-linux-musl"
-                    ))]
                     do_steps(msg);
-                    #[cfg(not(any(
-                        target = "arm-unknown-linux-musleabihf",
-                        target = "armv7-unknown-linux-musleabihf",
-                        target = "aarch64-unknown-linux-musl"
-                    )))]
                     {
                         print!("Simulated motor closes the door ...");
                         io::stdout().flush().unwrap();
