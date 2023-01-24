@@ -1,4 +1,4 @@
-use hardware::do_steps;
+use hardware::run_motor;
 use hardware::Direction;
 
 use std::{
@@ -20,7 +20,7 @@ pub fn run_stepper(mut receiver: Receiver<Direction>) {
             Direction::Open => {
                 if !is_open {
                     println!("Opening ...");
-                    do_steps(msg);
+                    run_motor(msg);
                     {
                         print!("Simulated motor opens the door ...");
                         io::stdout().flush().unwrap();
@@ -33,7 +33,7 @@ pub fn run_stepper(mut receiver: Receiver<Direction>) {
             Direction::Close => {
                 if is_open {
                     println!("Closing ...");
-                    do_steps(msg);
+                    run_motor(msg);
                     {
                         print!("Simulated motor closes the door ...");
                         io::stdout().flush().unwrap();

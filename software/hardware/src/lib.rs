@@ -1,3 +1,7 @@
-mod stepper;
+mod lock;
+mod lockswitch;
+mod motor;
 
-pub use stepper::{do_steps, Direction};
+pub use lock::DorLock;
+pub use lockswitch::LockSwitch;
+pub use motor::{run_motor, Direction};

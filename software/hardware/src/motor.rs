@@ -16,7 +16,7 @@ pub enum Direction {
     target = "armv7-unknown-linux-musleabihf",
     target = "aarch64-unknown-linux-musl"
 ))]
-pub fn do_steps(direction: Direction) {
+pub fn run_motor(direction: Direction) {
     // set motor direction
     let mut motor_direction_gpio = Gpio::new().unwrap().get(24).unwrap().into_output();
     match direction {
@@ -30,7 +30,7 @@ pub fn do_steps(direction: Direction) {
     const STEPPS: i64 = 32000;
     const PWM_SLEEP_TIME: u64 = 100;
 
-    println!("Start stepper");
+    println!("Start motor");
 
     motor_driver_gpio.set_low();
 
@@ -43,7 +43,7 @@ pub fn do_steps(direction: Direction) {
 
     motor_driver_gpio.set_high();
 
-    println!("Stepper done");
+    println!("Stop motor");
 }
 
 #[cfg(not(any(
@@ -51,6 +51,6 @@ pub fn do_steps(direction: Direction) {
     target = "armv7-unknown-linux-musleabihf",
     target = "aarch64-unknown-linux-musl"
 )))]
-pub fn do_steps(direction: Direction) {
+pub fn run_motor(direction: Direction) {
     println!("{:?}", direction);
 }
