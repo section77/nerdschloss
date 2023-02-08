@@ -1,7 +1,7 @@
-#[cfg(any(
-    target = "arm-unknown-linux-musleabihf",
-    target = "armv7-unknown-linux-musleabihf",
-    target = "aarch64-unknown-linux-musl"
+#[cfg(all(
+    any(target_arch = "arm", target_arch = "aarch64"),
+    target_env = "musl",
+    target_os = "linux"
 ))]
 use rppal::gpio::Gpio;
 
@@ -11,17 +11,19 @@ pub enum Direction {
     Close,
 }
 
-#[cfg(any(
-    target = "arm-unknown-linux-musleabihf",
-    target = "armv7-unknown-linux-musleabihf",
-    target = "aarch64-unknown-linux-musl"
+#[cfg(all(
+    any(target_arch = "arm", target_arch = "aarch64"),
+    target_env = "musl",
+    target_os = "linux"
 ))]
 pub fn run_motor(direction: Direction) {
+    println!("Hardware {direction:?}");
+
     // set motor direction
     let mut motor_direction_gpio = Gpio::new().unwrap().get(24).unwrap().into_output();
     match direction {
-        ::core => motor_direction_gpio.set_high(),
-        ::clone => motor_direction_gpio.set_low(),
+        Direction::Open => motor_direction_gpio.set_high(),
+        Direction::Close => motor_direction_gpio.set_low(),
     }
 
     let mut motor_gpio = Gpio::new().unwrap().get(23).unwrap().into_output();
@@ -46,11 +48,7 @@ pub fn run_motor(direction: Direction) {
     println!("Stop motor");
 }
 
-#[cfg(not(any(
-    target = "arm-unknown-linux-musleabihf",
-    target = "armv7-unknown-linux-musleabihf",
-    target = "aarch64-unknown-linux-musl"
-)))]
+#[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
 pub fn run_motor(direction: Direction) {
-    println!("{:?}", direction);
+    println!("Debug {direction:?}");
 }

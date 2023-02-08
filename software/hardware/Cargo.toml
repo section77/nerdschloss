@@ -10,6 +10,6 @@ edition = "2021"
 anyhow = "1"
 thiserror = "1"
 
-[target.'cfg(any(target = "arm-unknown-linux-musleabihf", target = "armv7-unknown-linux-musleabihf", target = "aarch64-unknown-linux-musl"))'.dependencies]
-rppal = {version = "0.14", optional = true}
+[target.'cfg(all(any(target_arch = "arm", target_arch = "aarch64"), target_env = "musl", target_os = "linux"))'.dependencies]
+rppal = "0.14"
 
