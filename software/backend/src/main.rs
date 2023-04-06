@@ -1,6 +1,6 @@
-use ::backend::setup;
-
 use poem::{listener::TcpListener, Server};
+
+use backend::setup;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<(), anyhow::Error> {

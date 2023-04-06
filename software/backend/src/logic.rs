@@ -1,16 +1,12 @@
-use hardware::run_motor;
-use hardware::Direction;
-
-use std::{
-    io::{self, Write},
-    thread,
-    time::Duration,
-};
-
 use tokio::sync::mpsc::Receiver;
+
+use hardware::{Direction, DorLock, DorLockSwitch};
 
 pub fn run_stepper(mut receiver: Receiver<Direction>) {
     let mut is_open = false;
+    let mut dorlock = DorLock::default();
+    let _dorlockswitch = DorLockSwitch::default();
+
     loop {
         let msg = match receiver.blocking_recv() {
             Some(m) => m,
@@ -20,26 +16,14 @@ pub fn run_stepper(mut receiver: Receiver<Direction>) {
             Direction::Open => {
                 if !is_open {
                     println!("Opening ...");
-                    run_motor(msg);
-                    {
-                        print!("Simulated motor opens the door ...");
-                        io::stdout().flush().unwrap();
-                        thread::sleep(Duration::from_secs(5));
-                        println!(" open!");
-                    }
+                    dorlock.unlock();
                     is_open = true;
                 }
             }
             Direction::Close => {
                 if is_open {
                     println!("Closing ...");
-                    run_motor(msg);
-                    {
-                        print!("Simulated motor closes the door ...");
-                        io::stdout().flush().unwrap();
-                        thread::sleep(Duration::from_secs(5));
-                        println!(" closed!");
-                    }
+                    dorlock.lock();
                     is_open = false;
                 }
             }

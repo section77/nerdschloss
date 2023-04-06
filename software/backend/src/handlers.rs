@@ -1,7 +1,7 @@
-use hardware::Direction;
-
 use poem::{handler, web::Data, IntoResponse};
 use tokio::sync::mpsc::Sender;
+
+use hardware::Direction;
 
 #[handler]
 pub async fn state() -> impl IntoResponse {
