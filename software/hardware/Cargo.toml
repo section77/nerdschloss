@@ -1,0 +1,15 @@
+[package]
+workspace = "../"
+name = "hardware"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1"
+thiserror = "1"
+
+[target.'cfg(all(any(target_arch = "arm", target_arch = "aarch64"), target_env = "musl", target_os = "linux"))'.dependencies]
+rppal = "0.14"
+
