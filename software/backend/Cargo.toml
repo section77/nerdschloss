@@ -4,6 +4,10 @@ name = "backend"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "nerdschloss"
+path = "src/main.rs"
+
 [dependencies]
 hardware = {path = "../hardware"}
 dotenvy = "0.15"
