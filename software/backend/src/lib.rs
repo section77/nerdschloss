@@ -1,11 +1,11 @@
 mod handlers;
 mod logic;
 
-use self::handlers::{close, open, state};
-use self::logic::run_stepper;
-
 use poem::{endpoint::EmbeddedFileEndpoint, get, EndpointExt, Route};
 use tokio::sync::mpsc::channel;
+
+use self::handlers::{close, open, state};
+use self::logic::run_stepper;
 
 // Setup embedded files
 #[derive(rust_embed::RustEmbed)]
@@ -17,7 +17,7 @@ pub fn setup() -> anyhow::Result<Route, anyhow::Error> {
     let (sender, receiver) = channel(1);
 
     // Start logic stuff
-    let _ = tokio::task::spawn_blocking(|| {
+    tokio::task::spawn_blocking(|| {
         run_stepper(receiver);
     });
 

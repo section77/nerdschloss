@@ -5,60 +5,71 @@
 ))]
 use rppal::gpio::{Gpio, InputPin, Level};
 
-#[derive(Debug)]
-pub enum LockSwitchState {
+#[derive(Debug, Default, Clone, Copy)]
+pub enum DorLockSwitchState {
+    #[default]
     Locked,
     Unlocked,
 }
 
-pub trait LockSwitchTrait {
-    fn state(&self) -> LockSwitchState;
+pub trait DorLockSwitchTrait {
+    fn state(&self) -> DorLockSwitchState;
 }
 
-pub struct LockSwitch {
-    lockswitch_pin: i32,
+#[derive(Debug)]
+pub struct DorLockSwitch {
+    state: DorLockSwitchState,
+    dorlockswitch_pin: i32,
     #[cfg(all(
         any(target_arch = "arm", target_arch = "aarch64"),
         target_env = "musl",
         target_os = "linux"
     ))]
-    lockswitch_gpio: InputPin,
+    dorlockswitch_gpio: InputPin,
 }
 
-impl LockSwitch {
+impl DorLockSwitch {
     #[cfg(all(
         any(target_arch = "arm", target_arch = "aarch64"),
         target_env = "musl",
         target_os = "linux"
     ))]
-    fn new(&self) -> Self {
+    pub fn new() -> Self {
         Self {
-            lockswitch_pin: 32,
-            lockswitch_gpio: Gpio::new().unwrap().get(42).unwrap().into_input(),
+            state: DorLockSwitchState::default(),
+            dorlockswitch_pin: 32,
+            dorlockswitch_gpio: Gpio::new().unwrap().get(42).unwrap().into_input(),
         }
     }
 
     #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
-    fn new(&self) -> Self {
-        Self { lockswitch_pin: 32 }
+    pub fn new() -> Self {
+        Self {
+            state: DorLockSwitchState::default(),
+            dorlockswitch_pin: 32,
+        }
     }
-}
 
-impl LockSwitchTrait for LockSwitch {
     #[cfg(all(
         any(target_arch = "arm", target_arch = "aarch64"),
         target_env = "musl",
         target_os = "linux"
     ))]
-    fn state(&self) -> LockSwitchState {
+    fn state(&self) -> DorLockSwitchState {
         match self.lockswitch_gpio.read() {
-            Level::High => LockSwitchState::Locked,
-            Level::Low => LockSwitchState::Unlocked,
+            Level::High => DorLockSwitchState::Locked,
+            Level::Low => DorLockSwitchState::Unlocked,
         }
     }
 
     #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
-    fn state(&self) -> LockSwitchState {
-        LockSwitchState::Locked
+    fn state(&self) -> DorLockSwitchState {
+        self.state
+    }
+}
+
+impl Default for DorLockSwitch {
+    fn default() -> Self {
+        Self::new()
     }
 }

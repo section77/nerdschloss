@@ -2,6 +2,6 @@ mod lock;
 mod lockswitch;
 mod motor;
 
-pub use lock::DorLock;
-pub use lockswitch::LockSwitch;
-pub use motor::{run_motor, Direction};
+pub use lock::{DorLock, DorLockState};
+pub use lockswitch::{DorLockSwitch, DorLockSwitchState};
+pub use motor::Direction;
