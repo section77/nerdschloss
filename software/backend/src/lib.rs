@@ -4,8 +4,10 @@ mod logic;
 use poem::{endpoint::EmbeddedFileEndpoint, get, EndpointExt, Route};
 use tokio::sync::mpsc::channel;
 
-use self::handlers::{close, open, state};
-use self::logic::run_stepper;
+use self::{
+    handlers::{close, open, state},
+    logic::run_stepper,
+};
 
 // Setup embedded files
 #[derive(rust_embed::RustEmbed)]
