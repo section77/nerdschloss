@@ -56,7 +56,7 @@ impl DorLockSwitch {
         target_os = "linux"
     ))]
     fn state(&self) -> DorLockSwitchState {
-        match self.lockswitch_gpio.read() {
+        match self.dorlockswitch_gpio.read() {
             Level::High => DorLockSwitchState::Locked,
             Level::Low => DorLockSwitchState::Unlocked,
         }
