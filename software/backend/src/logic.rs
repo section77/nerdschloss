@@ -19,12 +19,14 @@ pub fn run_stepper(mut receiver: Receiver<Direction>) {
                     is_open = true;
 
                     let client = reqwest::blocking::Client::new();
-                    let res = client.put("http://api.section77.de/sensors/people_now_present/")
+                    let _res = client
+                        .put("http://api.section77.de/sensors/people_now_present/")
                         .body("value=1")
-                        .header(reqwest::header::CONTENT_TYPE, "application/x-www-form-urlencoded")
-                        .send()
-                    ;
-
+                        .header(
+                            reqwest::header::CONTENT_TYPE,
+                            "application/x-www-form-urlencoded",
+                        )
+                        .send();
                 }
             }
             Direction::Close => {
@@ -34,11 +36,14 @@ pub fn run_stepper(mut receiver: Receiver<Direction>) {
                     is_open = false;
 
                     let client = reqwest::blocking::Client::new();
-                    let res = client.put("http://api.section77.de/sensors/people_now_present/")
+                    let _res = client
+                        .put("http://api.section77.de/sensors/people_now_present/")
                         .body("value=0")
-                        .header(reqwest::header::CONTENT_TYPE, "application/x-www-form-urlencoded")
-                        .send()
-                    ;
+                        .header(
+                            reqwest::header::CONTENT_TYPE,
+                            "application/x-www-form-urlencoded",
+                        )
+                        .send();
                 }
             }
         }
