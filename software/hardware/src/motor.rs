@@ -7,7 +7,7 @@ use rppal::gpio::Gpio;
 
 use crate::lock::DorLockConfig;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone, Copy)]
 pub enum Direction {
     Open,
     #[default]
