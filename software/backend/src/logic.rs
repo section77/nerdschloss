@@ -4,13 +4,12 @@ use hardware::{Direction, DorLock, DorLockSwitch};
 
 pub fn run_stepper(mut receiver: Receiver<Direction>) {
     let mut is_open = false;
-    let mut dorlock = DorLock::default();
     let _dorlockswitch = DorLockSwitch::default();
+    let mut dorlock = DorLock::default();
 
     loop {
-        let msg = match receiver.blocking_recv() {
-            Some(m) => m,
-            None => continue,
+        let Some(msg) = receiver.blocking_recv() else {
+            continue;
         };
         match msg {
             Direction::Open => {
