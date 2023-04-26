@@ -24,11 +24,11 @@ pub fn setup() -> anyhow::Result<Route, anyhow::Error> {
     });
 
     // Setup the routs
-    let app = Route::new()
+    let routes = Route::new()
         .at("/", EmbeddedFileEndpoint::<StaticFiles>::new("index.html"))
         .at("/state", get(state))
         .at("/open", get(open).data(sender.clone()))
         .at("/close", get(close).data(sender));
 
-    Ok(app)
+    Ok(routes)
 }
