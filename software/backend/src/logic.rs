@@ -2,6 +2,20 @@ use tokio::sync::mpsc::Receiver;
 
 use hardware::{Direction, DorLock, DorLockSwitch};
 
+async fn spaceapi(state: bool) {
+    let client = reqwest::Client::new();
+    client
+        .put("http://api.section77.de/sensors/people_now_present/")
+        .body(format!("value={}", i8::from(state)))
+        .header(
+            reqwest::header::CONTENT_TYPE,
+            "application/x-www-form-urlencoded",
+        )
+        .send()
+        .await
+        .expect("Failed to set SpaceAPI");
+}
+
 pub fn run_stepper(mut receiver: Receiver<Direction>) {
     let mut is_open = false;
     let _dorlockswitch = DorLockSwitch::default();
@@ -18,15 +32,9 @@ pub fn run_stepper(mut receiver: Receiver<Direction>) {
                     dorlock.unlock();
                     is_open = true;
 
-                    let client = reqwest::blocking::Client::new();
-                    let _res = client
-                        .put("http://api.section77.de/sensors/people_now_present/")
-                        .body("value=1")
-                        .header(
-                            reqwest::header::CONTENT_TYPE,
-                            "application/x-www-form-urlencoded",
-                        )
-                        .send();
+                    tokio::task::spawn(async {
+                        spaceapi(true).await;
+                    });
                 }
             }
             Direction::Close => {
@@ -35,15 +43,9 @@ pub fn run_stepper(mut receiver: Receiver<Direction>) {
                     dorlock.lock();
                     is_open = false;
 
-                    let client = reqwest::blocking::Client::new();
-                    let _res = client
-                        .put("http://api.section77.de/sensors/people_now_present/")
-                        .body("value=0")
-                        .header(
-                            reqwest::header::CONTENT_TYPE,
-                            "application/x-www-form-urlencoded",
-                        )
-                        .send();
+                    tokio::task::spawn(async {
+                        spaceapi(false).await;
+                    });
                 }
             }
         }
