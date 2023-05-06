@@ -10,6 +10,7 @@ path = "src/main.rs"
 
 [dependencies]
 hardware = {path = "../hardware"}
+clap = {version = "4", features = ["derive", "cargo", "env", "unicode"]}
 dotenvy = "0.15"
 log = "0.4"
 anyhow = "1"
