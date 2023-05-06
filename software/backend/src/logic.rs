@@ -5,7 +5,7 @@ use hardware::{Direction, DorLock, DorLockSwitch};
 async fn spaceapi(state: bool) {
     let Ok(_) = reqwest::Client::new()
         .put("http://api.section77.de/sensors/people_now_present/")
-        .body(format!("value={}", i8::from(state)))
+        .body(format!("value={}", u8::from(state)))
         .header(
             reqwest::header::CONTENT_TYPE,
             "application/x-www-form-urlencoded",
