@@ -3,8 +3,7 @@ use tokio::sync::mpsc::Receiver;
 use hardware::{Direction, DorLock, DorLockSwitch};
 
 async fn spaceapi(state: bool) {
-    let client = reqwest::Client::new();
-    client
+    let Ok(_) = reqwest::Client::new()
         .put("http://api.section77.de/sensors/people_now_present/")
         .body(format!("value={}", i8::from(state)))
         .header(
@@ -12,11 +11,13 @@ async fn spaceapi(state: bool) {
             "application/x-www-form-urlencoded",
         )
         .send()
-        .await
-        .expect("Failed to set SpaceAPI");
+        .await else {
+            eprintln!("Failed to set SpaceAPI");
+            return
+        };
 }
 
-pub fn run_stepper(mut receiver: Receiver<Direction>) {
+pub fn logic(mut receiver: Receiver<Direction>) {
     let mut is_open = false;
     let _dorlockswitch = DorLockSwitch::default();
     let mut dorlock = DorLock::default();

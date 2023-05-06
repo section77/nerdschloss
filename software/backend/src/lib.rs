@@ -6,7 +6,7 @@ use tokio::sync::mpsc::channel;
 
 use self::{
     handlers::{close, open, state},
-    logic::run_stepper,
+    logic::logic,
 };
 
 // Setup embedded files
@@ -20,7 +20,7 @@ pub fn setup() -> anyhow::Result<Route, anyhow::Error> {
 
     // Start logic stuff
     tokio::task::spawn_blocking(|| {
-        run_stepper(receiver);
+        logic(receiver);
     });
 
     // Setup the routs
