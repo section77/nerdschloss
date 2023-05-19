@@ -1,3 +1,5 @@
+use std::{fs, io::prelude::*};
+
 #[cfg(all(
     any(target_arch = "arm", target_arch = "aarch64"),
     target_env = "musl",
@@ -24,7 +26,7 @@ pub trait Unlockable {
     fn unlock(&self);
 }
 
-pub trait LockUnlockState {
+pub trait DorLockStateTrait {
     fn state(&self) -> DorLockState;
 }
 
@@ -35,7 +37,6 @@ pub struct DorLockConfig {
     pub motor_driver_pin: i32,
 }
 
-#[derive(Debug)]
 pub struct DorLock {
     state: DorLockState,
     config: DorLockConfig,
@@ -56,20 +57,26 @@ impl DorLock {
     pub fn lock(&mut self) {
         run_motor(self.config, Direction::Close);
         self.state = DorLockState::Locked;
+        let mut file = fs::File::options()
+            .write(true)
+            .truncate(true)
+            .open(super::STATE_FILE)
+            .unwrap();
+        write!(file, "false").unwrap();
     }
 
     pub fn unlock(&mut self) {
         run_motor(self.config, Direction::Open);
         self.state = DorLockState::Unlocked;
+        let mut file = fs::File::options()
+            .write(true)
+            .truncate(true)
+            .open(super::STATE_FILE)
+            .unwrap();
+        write!(file, "true").unwrap();
     }
 
     pub fn state(&self) -> DorLockState {
         self.state
-    }
-}
-
-impl Default for DorLock {
-    fn default() -> Self {
-        Self::new()
     }
 }

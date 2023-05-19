@@ -1,3 +1,5 @@
+use std::{fs, io::prelude::*};
+
 #[cfg(all(
     any(target_arch = "arm", target_arch = "aarch64"),
     target_env = "musl",
@@ -12,7 +14,25 @@ pub enum DorLockSwitchState {
     Unlocked,
 }
 
-pub trait DorLockSwitchTrait {
+impl std::convert::From<bool> for DorLockSwitchState {
+    fn from(b: bool) -> Self {
+        match b {
+            true => DorLockSwitchState::Unlocked,
+            false => DorLockSwitchState::Locked,
+        }
+    }
+}
+
+impl std::convert::From<DorLockSwitchState> for bool {
+    fn from(dlss: DorLockSwitchState) -> Self {
+        match dlss {
+            DorLockSwitchState::Unlocked => true,
+            DorLockSwitchState::Locked => false,
+        }
+    }
+}
+
+pub trait DorLockSwitchStateTrait {
     fn state(&self) -> DorLockSwitchState;
 }
 
@@ -35,6 +55,8 @@ impl DorLockSwitch {
         target_os = "linux"
     ))]
     pub fn new() -> Self {
+        Self::check_state_file();
+
         Self {
             state: DorLockSwitchState::default(),
             dorlockswitch_pin: 32,
@@ -44,12 +66,23 @@ impl DorLockSwitch {
 
     #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
     pub fn new() -> Self {
+        Self::check_state_file();
+
         Self {
             state: DorLockSwitchState::default(),
             dorlockswitch_pin: 32,
         }
     }
 
+    fn check_state_file() {
+        if fs::metadata(super::STATE_FILE).is_err() {
+            let mut file = fs::File::create(super::STATE_FILE).unwrap();
+            write!(file, "false").unwrap();
+        }
+    }
+}
+
+impl DorLockSwitchStateTrait for DorLockSwitch {
     #[cfg(all(
         any(target_arch = "arm", target_arch = "aarch64"),
         target_env = "musl",
@@ -64,7 +97,12 @@ impl DorLockSwitch {
 
     #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
     fn state(&self) -> DorLockSwitchState {
-        self.state
+        let mut file = fs::File::open(super::STATE_FILE).unwrap();
+        let mut contents = String::new();
+        file.read_to_string(&mut contents).unwrap();
+        let s: bool = contents.trim().parse().unwrap();
+
+        s.into()
     }
 }
 
