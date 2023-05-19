@@ -1,6 +1,6 @@
 use tokio::sync::mpsc::Receiver;
 
-use hardware::{Direction, DorLock, DorLockSwitch};
+use hardware::{Direction, DorLock, DorLockSwitch, DorLockSwitchStateTrait};
 
 async fn spaceapi(state: bool) {
     let Ok(_) = reqwest::Client::new()
@@ -18,9 +18,9 @@ async fn spaceapi(state: bool) {
 }
 
 pub fn logic(mut receiver: Receiver<Direction>) {
-    let mut is_open = false;
-    let _dorlockswitch = DorLockSwitch::default();
-    let mut dorlock = DorLock::default();
+    let dorlockswitch = DorLockSwitch::default();
+    let mut dorlock = DorLock::new();
+    let mut is_open = bool::from(dorlockswitch.state());
 
     loop {
         let Some(msg) = receiver.blocking_recv() else {
