@@ -30,13 +30,14 @@ pub trait DorLockStateTrait {
     fn state(&self) -> DorLockState;
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default)]
 pub struct DorLockConfig {
     pub motor_pin: i32,
     pub motor_direction_pin: i32,
     pub motor_driver_pin: i32,
 }
 
+#[derive(Debug, Clone, Copy, Default)]
 pub struct DorLock {
     state: DorLockState,
     config: DorLockConfig,

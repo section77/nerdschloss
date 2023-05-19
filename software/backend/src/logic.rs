@@ -19,7 +19,7 @@ async fn spaceapi(state: bool) {
 
 pub fn logic(mut receiver: Receiver<Direction>) {
     let dorlockswitch = DorLockSwitch::default();
-    let mut dorlock = DorLock::new();
+    let mut dorlock = DorLock::default();
     let mut is_open = bool::from(dorlockswitch.state());
 
     loop {
