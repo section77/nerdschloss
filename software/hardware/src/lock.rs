@@ -1,5 +1,3 @@
-use std::{fs, io::prelude::*};
-
 #[cfg(all(
     any(target_arch = "arm", target_arch = "aarch64"),
     target_env = "musl",
@@ -16,6 +14,26 @@ pub enum DorLockState {
     Locking,
     Unlocked,
     Unlocking,
+}
+
+impl std::convert::From<bool> for DorLockState {
+    fn from(b: bool) -> Self {
+        match b {
+            true => Self::Unlocked,
+            false => Self::Locked,
+        }
+    }
+}
+
+impl std::convert::From<DorLockState> for bool {
+    fn from(dls: DorLockState) -> Self {
+        match dls {
+            DorLockState::Unlocked => true,
+            DorLockState::Unlocking => false,
+            DorLockState::Locked => false,
+            DorLockState::Locking => false,
+        }
+    }
 }
 
 pub trait Lockable {
@@ -56,25 +74,15 @@ impl DorLock {
     }
 
     pub fn lock(&mut self) {
+        self.state = DorLockState::Locking;
         run_motor(self.config, Direction::Close);
         self.state = DorLockState::Locked;
-        let mut file = fs::File::options()
-            .write(true)
-            .truncate(true)
-            .open(super::STATE_FILE)
-            .unwrap();
-        write!(file, "false").unwrap();
     }
 
     pub fn unlock(&mut self) {
+        self.state = DorLockState::Unlocking;
         run_motor(self.config, Direction::Open);
         self.state = DorLockState::Unlocked;
-        let mut file = fs::File::options()
-            .write(true)
-            .truncate(true)
-            .open(super::STATE_FILE)
-            .unwrap();
-        write!(file, "true").unwrap();
     }
 
     pub fn state(&self) -> DorLockState {

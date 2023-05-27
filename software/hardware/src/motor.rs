@@ -1,3 +1,5 @@
+use std::{fs, io::prelude::*};
+
 #[cfg(all(
     any(target_arch = "arm", target_arch = "aarch64"),
     target_env = "musl",
@@ -55,4 +57,14 @@ pub fn run_motor(config: DorLockConfig, direction: Direction) {
 pub fn run_motor(config: DorLockConfig, direction: Direction) {
     dbg!(config);
     println!("Debug {direction:?}");
+
+    let mut file = fs::File::options()
+        .write(true)
+        .truncate(true)
+        .open(super::STATE_FILE)
+        .unwrap();
+    match direction {
+        Direction::Open => write!(file, "true").unwrap(),
+        Direction::Close => write!(file, "false").unwrap(),
+    }
 }
