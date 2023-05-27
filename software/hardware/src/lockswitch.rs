@@ -55,12 +55,10 @@ impl DorLockSwitch {
         target_os = "linux"
     ))]
     pub fn new() -> Self {
-        Self::check_state_file();
-
         Self {
             state: DorLockSwitchState::default(),
             dorlockswitch_pin: 32,
-            dorlockswitch_gpio: Gpio::new().unwrap().get(42).unwrap().into_input(),
+            dorlockswitch_gpio: Gpio::new().unwrap().get(22).unwrap().into_input(),
         }
     }
 
