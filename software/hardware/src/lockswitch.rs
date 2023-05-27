@@ -38,8 +38,6 @@ pub trait DorLockSwitchStateTrait {
 
 #[derive(Debug)]
 pub struct DorLockSwitch {
-    state: DorLockSwitchState,
-    dorlockswitch_pin: i32,
     #[cfg(all(
         any(target_arch = "arm", target_arch = "aarch64"),
         target_env = "musl",
@@ -56,8 +54,6 @@ impl DorLockSwitch {
     ))]
     pub fn new() -> Self {
         Self {
-            state: DorLockSwitchState::default(),
-            dorlockswitch_pin: 32,
             dorlockswitch_gpio: Gpio::new().unwrap().get(22).unwrap().into_input(),
         }
     }
@@ -66,10 +62,7 @@ impl DorLockSwitch {
     pub fn new() -> Self {
         Self::check_state_file();
 
-        Self {
-            state: DorLockSwitchState::default(),
-            dorlockswitch_pin: 32,
-        }
+        Self {}
     }
 
     fn check_state_file() {
