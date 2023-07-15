@@ -54,7 +54,7 @@ impl DorLockSwitch {
     ))]
     pub fn new() -> Self {
         Self {
-            dorlockswitch_gpio: Gpio::new().unwrap().get(22).unwrap().into_input(),
+            dorlockswitch_gpio: Gpio::new().unwrap().get(22).unwrap().into_input_pullup(),
         }
     }
 
@@ -65,6 +65,7 @@ impl DorLockSwitch {
         Self {}
     }
 
+    #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
     fn check_state_file() {
         if fs::metadata(super::STATE_FILE).is_err() {
             let mut file = fs::File::create(super::STATE_FILE).unwrap();
@@ -80,9 +81,9 @@ impl DorLockSwitchStateTrait for DorLockSwitch {
         target_os = "linux"
     ))]
     fn state(&self) -> DorLockSwitchState {
-        match self.dorlockswitch_gpio.read() {
-            Level::High => DorLockSwitchState::Locked,
-            Level::Low => DorLockSwitchState::Unlocked,
+        match &self.dorlockswitch_gpio.read() {
+            Level::Low => DorLockSwitchState::Locked,
+            Level::High => DorLockSwitchState::Unlocked,
         }
     }
 
