@@ -11,5 +11,5 @@ anyhow = "1"
 thiserror = "1"
 
 [target.'cfg(all(any(target_arch = "arm", target_arch = "aarch64"), target_env = "musl", target_os = "linux"))'.dependencies]
-rppal = "0.14"
+rppal = {version = "0.14", features = ["hal"]}
 
