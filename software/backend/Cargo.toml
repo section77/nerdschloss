@@ -12,7 +12,8 @@ path = "src/main.rs"
 hardware = {path = "../hardware"}
 clap = {version = "4", features = ["derive", "cargo", "env", "unicode"]}
 dotenvy = "0.15"
-figment = { version = "0.10", features = ["toml", "env"] }
+figment = {version = "0.10", features = ["toml", "env"]}
+serde = {version = "1", features = ["derive"]}
 log = "0.4"
 anyhow = "1"
 thiserror = "1"
