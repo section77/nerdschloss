@@ -3,15 +3,20 @@ workspace = ".."
 name = "backend"
 version = "0.2.0"
 edition = "2021"
+build = "build.rs"
 
 [[bin]]
 name = "nerdschloss"
 path = "src/main.rs"
 
+[build-dependencies]
+shadow-rs = "0.24"
+
 [dependencies]
 hardware = {path = "../hardware"}
 clap = {version = "4", features = ["derive", "cargo", "env", "unicode"]}
 dotenvy = "0.15"
+shadow-rs = "0.24"
 config = {version = "0.13", default-features= false, features = ["toml"]}
 directories-next = "2"
 serde = {version = "1", features = ["derive"]}

@@ -1,8 +1,11 @@
 use anyhow::{Error, Result};
 use clap::Parser;
 use poem::{listener::TcpListener, Server};
+use shadow_rs::shadow;
 
 use backend::{configuration, setup};
+
+shadow!(build);
 
 /// nerdschloss
 #[derive(Parser, Debug)]
@@ -43,7 +46,7 @@ async fn main() -> Result<(), Error> {
         return Ok(());
     }
     if args.show_build_details {
-        //build::print_build_in();
+        build::print_build_in();
         return Ok(());
     }
 
