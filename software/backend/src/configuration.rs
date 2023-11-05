@@ -1,0 +1,68 @@
+use anyhow::Result;
+use config::{Config, ConfigError, Environment, File};
+use directories_next::ProjectDirs;
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Configuration {
+    pub server: Server,
+
+    pub spaceapi: bool,
+
+    pub motor: Motor,
+    pub lockswitch: LockSwitch,
+    pub dorswitch: DorSwitch,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Server {
+    pub ipaddress: std::net::IpAddr,
+    pub port: u16,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Motor {
+    pub pin: i16,
+    pub direction: i16,
+    pub driver: i16,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LockSwitch {
+    pub pin: i16,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DorSwitch {
+    pub pin: i16,
+}
+
+impl Configuration {
+    pub fn new() -> Result<Self, ConfigError> {
+        const APP_NAME: &str = "NERDSCHLOSS";
+
+        let config_path = ProjectDirs::from("de", "MathPeterIT", &APP_NAME.to_lowercase())
+            .expect("User configuration directory not found");
+        let user_config_path = config_path
+            .config_dir()
+            .to_str()
+            .expect("User configuration directory not found");
+
+        // Parse settings from configuration files and environment
+        let c = Config::builder()
+            .add_source(
+                File::with_name(&format!("/etc/{}", APP_NAME.to_lowercase())).required(false),
+            )
+            .add_source(File::with_name(user_config_path).required(false))
+            .add_source(File::with_name(&APP_NAME.to_lowercase()).required(false))
+            .add_source(
+                Environment::with_prefix(APP_NAME)
+                    .try_parsing(true)
+                    .separator("_"),
+            )
+            .build()
+            .expect("grrr");
+
+        c.try_deserialize()
+    }
+}

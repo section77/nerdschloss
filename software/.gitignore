@@ -1,2 +1,4 @@
 target/
 *.FCStd[0-9]*
+
+.env
