@@ -11,7 +11,7 @@ pub struct Configuration {
 
     pub motor: Motor,
     pub lockswitch: LockSwitch,
-    pub dorswitch: DorSwitch,
+    pub doorswitch: DoorSwitch,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -41,7 +41,7 @@ pub struct LockSwitch {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DorSwitch {
+pub struct DoorSwitch {
     pub pin: i16,
 }
 

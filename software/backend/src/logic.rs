@@ -1,6 +1,6 @@
 use tokio::sync::mpsc::Receiver;
 
-use hardware::{Direction, DorLock, DorLockSwitch, DorLockSwitchStateTrait};
+use hardware::{Direction, Lock, LockSwitch, LockSwitchStateTrait};
 
 const SPACEAPI: bool = false;
 
@@ -20,31 +20,31 @@ async fn spaceapi(state: bool) {
 }
 
 pub fn logic(mut receiver: Receiver<Direction>) {
-    let dorlockswitch = DorLockSwitch::default();
-    let mut dorlock = DorLock::default();
+    let lockswitch = LockSwitch::default();
+    let mut lock = Lock::default();
     let mut is_open: bool;
 
     loop {
         let Some(msg) = receiver.blocking_recv() else {
             continue;
         };
-        is_open = bool::from(dorlockswitch.state());
+        is_open = bool::from(lockswitch.state());
         match msg {
             Direction::Open => {
                 if !is_open {
                     println!("Opening ...");
-                    dorlock.unlock();
+                    lock.unlock();
                 }
             }
             Direction::Close => {
                 if is_open {
                     println!("Closing ...");
-                    dorlock.lock();
+                    lock.lock();
                 }
             }
         }
 
-        let state = SPACEAPI && dorlockswitch.state().into() && dorlock.state().into();
+        let state = SPACEAPI && lockswitch.state().into() && lock.state().into();
         tokio::task::spawn(async move {
             spaceapi(state).await;
         });

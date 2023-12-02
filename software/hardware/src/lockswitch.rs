@@ -8,45 +8,45 @@ use std::{fs, io::prelude::*};
 use rppal::gpio::{Gpio, InputPin, Level};
 
 #[derive(Debug, Default, Clone, Copy)]
-pub enum DorLockSwitchState {
+pub enum LockSwitchState {
     #[default]
     Locked,
     Unlocked,
 }
 
-impl std::convert::From<bool> for DorLockSwitchState {
+impl std::convert::From<bool> for LockSwitchState {
     fn from(b: bool) -> Self {
         match b {
-            true => DorLockSwitchState::Unlocked,
-            false => DorLockSwitchState::Locked,
+            true => LockSwitchState::Unlocked,
+            false => LockSwitchState::Locked,
         }
     }
 }
 
-impl std::convert::From<DorLockSwitchState> for bool {
-    fn from(dlss: DorLockSwitchState) -> Self {
+impl std::convert::From<LockSwitchState> for bool {
+    fn from(dlss: LockSwitchState) -> Self {
         match dlss {
-            DorLockSwitchState::Unlocked => true,
-            DorLockSwitchState::Locked => false,
+            LockSwitchState::Unlocked => true,
+            LockSwitchState::Locked => false,
         }
     }
 }
 
-pub trait DorLockSwitchStateTrait {
-    fn state(&self) -> DorLockSwitchState;
+pub trait LockSwitchStateTrait {
+    fn state(&self) -> LockSwitchState;
 }
 
 #[derive(Debug)]
-pub struct DorLockSwitch {
+pub struct LockSwitch {
     #[cfg(all(
         any(target_arch = "arm", target_arch = "aarch64"),
         target_env = "musl",
         target_os = "linux"
     ))]
-    dorlockswitch_gpio: InputPin,
+    lockswitch_gpio: InputPin,
 }
 
-impl DorLockSwitch {
+impl LockSwitch {
     #[cfg(all(
         any(target_arch = "arm", target_arch = "aarch64"),
         target_env = "musl",
@@ -54,7 +54,7 @@ impl DorLockSwitch {
     ))]
     pub fn new() -> Self {
         Self {
-            dorlockswitch_gpio: Gpio::new().unwrap().get(22).unwrap().into_input_pullup(),
+            lockswitch_gpio: Gpio::new().unwrap().get(22).unwrap().into_input_pullup(),
         }
     }
 
@@ -74,21 +74,21 @@ impl DorLockSwitch {
     }
 }
 
-impl DorLockSwitchStateTrait for DorLockSwitch {
+impl LockSwitchStateTrait for LockSwitch {
     #[cfg(all(
         any(target_arch = "arm", target_arch = "aarch64"),
         target_env = "musl",
         target_os = "linux"
     ))]
-    fn state(&self) -> DorLockSwitchState {
-        match &self.dorlockswitch_gpio.read() {
-            Level::Low => DorLockSwitchState::Locked,
-            Level::High => DorLockSwitchState::Unlocked,
+    fn state(&self) -> LockSwitchState {
+        match &self.lockswitch_gpio.read() {
+            Level::Low => LockSwitchState::Locked,
+            Level::High => LockSwitchState::Unlocked,
         }
     }
 
     #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
-    fn state(&self) -> DorLockSwitchState {
+    fn state(&self) -> LockSwitchState {
         let mut file = fs::File::open(super::STATE_FILE).unwrap();
         let mut contents = String::new();
         file.read_to_string(&mut contents).unwrap();
@@ -98,7 +98,7 @@ impl DorLockSwitchStateTrait for DorLockSwitch {
     }
 }
 
-impl Default for DorLockSwitch {
+impl Default for LockSwitch {
     fn default() -> Self {
         Self::new()
     }

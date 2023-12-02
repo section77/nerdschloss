@@ -7,7 +7,7 @@ use std::{fs, io::prelude::*};
 ))]
 use rppal::gpio::Gpio;
 
-use crate::lock::DorLockConfig;
+use crate::lock::LockConfig;
 
 #[derive(Debug, Default, Clone, Copy)]
 pub enum Direction {
@@ -21,7 +21,7 @@ pub enum Direction {
     target_env = "musl",
     target_os = "linux"
 ))]
-pub fn run_motor(config: DorLockConfig, direction: Direction) {
+pub fn run_motor(config: LockConfig, direction: Direction) {
     println!("Hardware {direction:?}");
 
     // set motor direction
@@ -54,7 +54,7 @@ pub fn run_motor(config: DorLockConfig, direction: Direction) {
 }
 
 #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
-pub fn run_motor(config: DorLockConfig, direction: Direction) {
+pub fn run_motor(config: LockConfig, direction: Direction) {
     dbg!(config);
     println!("Debug {direction:?}");
 
