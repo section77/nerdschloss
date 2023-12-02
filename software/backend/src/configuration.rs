@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 pub struct Configuration {
     pub server: Server,
 
-    pub spaceapi: bool,
+    pub spaceapi: SpaceAPI,
 
     pub motor: Motor,
     pub lockswitch: LockSwitch,
@@ -18,6 +18,14 @@ pub struct Configuration {
 pub struct Server {
     pub ipaddress: std::net::IpAddr,
     pub port: u16,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SpaceAPI {
+    pub enable: bool,
+    pub url: String,
+    pub username: String,
+    pub password: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
