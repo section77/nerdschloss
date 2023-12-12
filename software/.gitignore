@@ -2,3 +2,5 @@ target/
 *.FCStd[0-9]*
 
 .env
+api/door_status.txt
+
