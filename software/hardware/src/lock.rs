@@ -1,10 +1,3 @@
-#[cfg(all(
-    any(target_arch = "arm", target_arch = "aarch64"),
-    target_env = "musl",
-    target_os = "linux"
-))]
-use rppal::gpio::{Gpio, InputPin, Level};
-
 use crate::motor::{run_motor, Direction};
 
 #[derive(Debug, Default, Clone, Copy)]
