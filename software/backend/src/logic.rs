@@ -1,7 +1,7 @@
 use tokio::sync::mpsc::Receiver;
 
 use crate::configuration::{Configuration, SpaceAPI};
-use hardware::{Direction, Lock, LockSwitch, LockSwitchStateTrait};
+use hardware::{Direction, DoorSwitch, Lock, LockSwitch, LockSwitchStateTrait};
 
 async fn spaceapi(spaceapi: &SpaceAPI, state: bool) {
     let status = if state {
@@ -27,6 +27,7 @@ async fn spaceapi(spaceapi: &SpaceAPI, state: bool) {
 
 pub fn logic(configuration: Configuration, mut receiver: Receiver<Direction>) {
     let lockswitch = LockSwitch::default();
+    let _doorswitch = DoorSwitch::default();
     let mut lock = Lock::default();
     let mut is_open: bool;
 
