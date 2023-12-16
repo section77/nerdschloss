@@ -3,7 +3,7 @@ use config::{Config, ConfigError, Environment, File};
 use directories_next::ProjectDirs;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Server {
     pub ipaddress: std::net::IpAddr,
     pub port: u16,
@@ -17,19 +17,19 @@ pub struct SpaceAPI {
     pub password: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Motor {
     pub pin: u8,
     pub direction: u8,
     pub driver: u8,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct LockSwitch {
     pub pin: u8,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct DoorSwitch {
     pub pin: u8,
 }
