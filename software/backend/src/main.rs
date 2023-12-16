@@ -58,7 +58,7 @@ async fn main() -> Result<(), Error> {
 
     // Serve the application
     let server = Server::new(listener);
-    let route = setup()?;
+    let route = setup(configuration)?;
     server.run(route).await?;
     Ok(())
 }

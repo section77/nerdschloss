@@ -6,6 +6,7 @@ use poem::{endpoint::EmbeddedFileEndpoint, get, EndpointExt, Route};
 use tokio::sync::mpsc::channel;
 
 use self::{
+    configuration::Configuration,
     handlers::{close, open, state},
     logic::logic,
 };
@@ -15,13 +16,13 @@ use self::{
 #[folder = "../frontend/static/"]
 struct StaticFiles;
 
-pub fn setup() -> anyhow::Result<Route, anyhow::Error> {
+pub fn setup(configuration: Configuration) -> anyhow::Result<Route, anyhow::Error> {
     // Create channel
     let (sender, receiver) = channel(1);
 
     // Start logic stuff
     tokio::task::spawn_blocking(|| {
-        logic(receiver);
+        logic(configuration, receiver);
     });
 
     // Setup the routs

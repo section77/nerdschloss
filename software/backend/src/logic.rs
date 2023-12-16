@@ -1,25 +1,31 @@
 use tokio::sync::mpsc::Receiver;
 
+use crate::configuration::{Configuration, SpaceAPI};
 use hardware::{Direction, Lock, LockSwitch, LockSwitchStateTrait};
 
-const SPACEAPI: bool = false;
-
-async fn spaceapi(state: bool) {
-    let Ok(_) = reqwest::Client::new()
-        .put("http://api.section77.de/sensors/people_now_present/")
-        .body(format!("value={}", u8::from(state)))
-        .header(
-            reqwest::header::CONTENT_TYPE,
-            "application/x-www-form-urlencoded",
-        )
+async fn spaceapi(spaceapi: &SpaceAPI, state: bool) {
+    let status = if state {
+        String::from("open")
+    } else {
+        String::from("closed")
+    };
+    match reqwest::Client::new()
+        .put(format!(
+            "https://api.section77.de/set_door_status.php?status={}",
+            status
+        ))
+        .basic_auth(&spaceapi.username, Some(&spaceapi.password))
         .send()
-        .await else {
-            eprintln!("Failed to set SpaceAPI");
-            return
-        };
+        .await
+    {
+        Ok(_) => (),
+        Err(e) => {
+            eprintln!("Failed to set SpaceAPI: {:?}", e);
+        }
+    };
 }
 
-pub fn logic(mut receiver: Receiver<Direction>) {
+pub fn logic(configuration: Configuration, mut receiver: Receiver<Direction>) {
     let lockswitch = LockSwitch::default();
     let mut lock = Lock::default();
     let mut is_open: bool;
@@ -44,9 +50,13 @@ pub fn logic(mut receiver: Receiver<Direction>) {
             }
         }
 
-        let state = SPACEAPI && lockswitch.state().into() && lock.state().into();
-        tokio::task::spawn(async move {
-            spaceapi(state).await;
-        });
+        if configuration.spaceapi.enable {
+            let spaceapi_configuration = configuration.spaceapi.clone();
+            let state = lockswitch.state().into();
+
+            tokio::task::spawn(async move {
+                spaceapi(&spaceapi_configuration, state).await;
+            });
+        }
     }
 }
