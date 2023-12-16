@@ -18,7 +18,7 @@ pub struct SpaceAPI {
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct Motor {
+pub struct LockMotor {
     pub pin: u8,
     pub direction: u8,
     pub driver: u8,
@@ -41,7 +41,7 @@ pub struct Configuration {
     pub spaceapi: SpaceAPI,
 
     // hardware
-    pub motor: Motor,
+    pub lockmotor: LockMotor,
     pub lockswitch: LockSwitch,
     pub doorswitch: DoorSwitch,
 }
