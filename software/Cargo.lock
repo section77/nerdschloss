@@ -384,17 +384,17 @@ dependencies = [
 
 [[package]]
 name = "embedded-hal"
-version = "1.0.0-alpha.9"
+version = "1.0.0-rc.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "129b101ddfee640565f7c07b301a31d95aa21e5acef21a491c307139f5fa4c91"
+checksum = "3e57ec6ad0bc8eb967cf9c9f144177f5e8f2f6f02dad0b8b683f9f05f6b22def"
 
 [[package]]
 name = "embedded-hal-nb"
-version = "1.0.0-alpha.1"
+version = "1.0.0-rc.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7e0760ec0a3bf76859d5e33f39542af103f157d5b2ecfb00ace56dd461472e3a"
+checksum = "67c4325112d63ff5991e2841960a1320516c33ff7237e924eaab0772b1123703"
 dependencies = [
- "embedded-hal 1.0.0-alpha.9",
+ "embedded-hal 1.0.0-rc.2",
  "nb 1.1.0",
 ]
 
@@ -1187,12 +1187,12 @@ dependencies = [
 
 [[package]]
 name = "rppal"
-version = "0.15.0"
+version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "815253b59e1b9c89918977155f7a4f39007cfe2b0cc5cf50615f9df275b9453c"
+checksum = "23aff72e177b0e0b0e0801bbe9f41de2abafd396dfb69af9c602ffba8c2091b3"
 dependencies = [
  "embedded-hal 0.2.7",
- "embedded-hal 1.0.0-alpha.9",
+ "embedded-hal 1.0.0-rc.2",
  "embedded-hal-nb",
  "libc",
  "nb 0.1.3",
