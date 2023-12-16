@@ -4,17 +4,6 @@ use directories_next::ProjectDirs;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Configuration {
-    pub server: Server,
-
-    pub spaceapi: SpaceAPI,
-
-    pub motor: Motor,
-    pub lockswitch: LockSwitch,
-    pub doorswitch: DoorSwitch,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Server {
     pub ipaddress: std::net::IpAddr,
     pub port: u16,
@@ -30,19 +19,31 @@ pub struct SpaceAPI {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Motor {
-    pub pin: i16,
-    pub direction: i16,
-    pub driver: i16,
+    pub pin: u8,
+    pub direction: u8,
+    pub driver: u8,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LockSwitch {
-    pub pin: i16,
+    pub pin: u8,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DoorSwitch {
-    pub pin: i16,
+    pub pin: u8,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Configuration {
+    pub server: Server,
+
+    pub spaceapi: SpaceAPI,
+
+    // hardware
+    pub motor: Motor,
+    pub lockswitch: LockSwitch,
+    pub doorswitch: DoorSwitch,
 }
 
 impl Configuration {
