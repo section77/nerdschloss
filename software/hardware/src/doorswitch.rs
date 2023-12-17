@@ -1,12 +1,19 @@
 #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
 use std::{fs, io::prelude::*};
 
+use serde::{Deserialize, Serialize};
+
 #[cfg(all(
     any(target_arch = "arm", target_arch = "aarch64"),
     target_env = "musl",
     target_os = "linux"
 ))]
 use rppal::gpio::{Gpio, InputPin, Level};
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct DoorSwitchConfiguration {
+    pub pin: u8,
+}
 
 #[derive(Debug, Default, Clone, Copy)]
 pub enum DoorSwitchState {

@@ -3,6 +3,8 @@ use config::{Config, ConfigError, Environment, File};
 use directories_next::ProjectDirs;
 use serde::{Deserialize, Serialize};
 
+use hardware::{DoorSwitchConfiguration, LockMotorConfiguration, LockSwitchConfiguration};
+
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Server {
     pub ipaddress: std::net::IpAddr,
@@ -17,23 +19,6 @@ pub struct SpaceAPI {
     pub password: String,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct LockMotor {
-    pub pin: u8,
-    pub direction: u8,
-    pub driver: u8,
-}
-
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct LockSwitch {
-    pub pin: u8,
-}
-
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct DoorSwitch {
-    pub pin: u8,
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Configuration {
     pub server: Server,
@@ -41,9 +26,9 @@ pub struct Configuration {
     pub spaceapi: SpaceAPI,
 
     // hardware
-    pub lockmotor: LockMotor,
-    pub lockswitch: LockSwitch,
-    pub doorswitch: DoorSwitch,
+    pub lockmotor: LockMotorConfiguration,
+    pub lockswitch: LockSwitchConfiguration,
+    pub doorswitch: DoorSwitchConfiguration,
 }
 
 impl Configuration {

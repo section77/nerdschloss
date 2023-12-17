@@ -1,4 +1,13 @@
+use serde::{Deserialize, Serialize};
+
 use crate::motor::{run_motor, Direction};
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct LockMotorConfiguration {
+    pub pin: u8,
+    pub direction: u8,
+    pub driver: u8,
+}
 
 #[derive(Debug, Default, Clone, Copy)]
 pub enum LockState {

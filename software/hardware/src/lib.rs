@@ -4,9 +4,9 @@ mod lockswitch;
 mod motor;
 
 pub use self::{
-    doorswitch::{DoorSwitch, DoorSwitchState, DoorSwitchStateTrait},
-    lock::{Lock, LockState},
-    lockswitch::{LockSwitch, LockSwitchState, LockSwitchStateTrait},
+    doorswitch::{DoorSwitch, DoorSwitchConfiguration, DoorSwitchState, DoorSwitchStateTrait},
+    lock::{Lock, LockMotorConfiguration, LockState},
+    lockswitch::{LockSwitch, LockSwitchConfiguration, LockSwitchState, LockSwitchStateTrait},
     motor::Direction,
 };
 
