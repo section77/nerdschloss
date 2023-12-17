@@ -27,8 +27,8 @@ async fn spaceapi(spaceapi: &SpaceAPI, state: bool) {
 }
 
 pub fn logic(configuration: Configuration, mut receiver: Receiver<Direction>) {
-    let lockswitch = LockSwitch::default();
-    let _doorswitch = DoorSwitch::default();
+    let lockswitch = LockSwitch::new(&configuration.lockswitch);
+    let _doorswitch = DoorSwitch::new(&configuration.doorswitch);
     let mut lock = Lock::default();
     let mut is_open: bool;
 

@@ -60,15 +60,22 @@ impl DoorSwitch {
         target_env = "musl",
         target_os = "linux"
     ))]
-    pub fn new() -> Self {
+    pub fn new(configuration: &DoorSwitchConfiguration) -> Self {
         Self {
-            doorswitch_gpio: Gpio::new().unwrap().get(22).unwrap().into_input_pullup(),
+            // doorswitch_gpio: Gpio::new().unwrap().get(22).unwrap().into_input_pullup(),
+            doorswitch_gpio: Gpio::new()
+                .unwrap()
+                .get(&configuration.pin)
+                .unwrap()
+                .into_input_pullup(),
         }
     }
 
     #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
-    pub fn new() -> Self {
+    pub fn new(configuration: &DoorSwitchConfiguration) -> Self {
         Self::check_state_file();
+
+        dbg!(configuration);
 
         Self {}
     }
@@ -103,11 +110,5 @@ impl DoorSwitchStateTrait for DoorSwitch {
         let s: bool = contents.trim().parse().unwrap();
 
         s.into()
-    }
-}
-
-impl Default for DoorSwitch {
-    fn default() -> Self {
-        Self::new()
     }
 }
