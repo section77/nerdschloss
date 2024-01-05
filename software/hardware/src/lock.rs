@@ -50,40 +50,29 @@ pub trait LockStateTrait {
     fn state(&self) -> LockState;
 }
 
-#[derive(Debug, Clone, Copy, Default)]
-pub struct LockConfig {
-    pub motor_pin: i32,
-    pub motor_direction_pin: i32,
-    pub motor_driver_pin: i32,
-}
-
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy)]
 pub struct Lock {
     state: LockState,
-    config: LockConfig,
+    configuration: LockMotorConfiguration,
 }
 
 impl Lock {
-    pub fn new() -> Self {
+    pub fn new(configuration: LockMotorConfiguration) -> Self {
         Self {
             state: LockState::Locked,
-            config: LockConfig {
-                motor_pin: 23,
-                motor_direction_pin: 24,
-                motor_driver_pin: 25,
-            },
+            configuration,
         }
     }
 
     pub fn lock(&mut self) {
         self.state = LockState::Locking;
-        run_motor(self.config, Direction::Close);
+        run_motor(self.configuration, Direction::Close);
         self.state = LockState::Locked;
     }
 
     pub fn unlock(&mut self) {
         self.state = LockState::Unlocking;
-        run_motor(self.config, Direction::Open);
+        run_motor(self.configuration, Direction::Open);
         self.state = LockState::Unlocked;
     }
 

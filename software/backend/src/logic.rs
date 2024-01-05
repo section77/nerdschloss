@@ -27,10 +27,10 @@ async fn spaceapi(spaceapi: &SpaceAPI, state: bool) {
 }
 
 pub fn logic(configuration: Configuration, mut receiver: Receiver<Direction>) {
-    let lockswitch = LockSwitch::new(&configuration.lockswitch);
-    let _doorswitch = DoorSwitch::new(&configuration.doorswitch);
-    let mut lock = Lock::default();
-    let mut is_open: bool;
+    let lockswitch = LockSwitch::new(configuration.lockswitch);
+    let _doorswitch = DoorSwitch::new(configuration.doorswitch);
+    let mut lock = Lock::new(configuration.lockmotor);
+    let mut is_open;
 
     loop {
         let Some(msg) = receiver.blocking_recv() else {

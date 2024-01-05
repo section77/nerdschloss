@@ -8,7 +8,7 @@ use std::{fs, io::prelude::*};
 ))]
 use rppal::gpio::Gpio;
 
-use crate::lock::LockConfig;
+use crate::lock::LockMotorConfiguration;
 
 #[derive(Debug, Default, Clone, Copy)]
 pub enum Direction {
@@ -22,18 +22,30 @@ pub enum Direction {
     target_env = "musl",
     target_os = "linux"
 ))]
-pub fn run_motor(config: LockConfig, direction: Direction) {
+pub fn run_motor(configuration: LockMotorConfiguration, direction: Direction) {
     println!("Hardware {direction:?}");
 
     // set motor direction
-    let mut motor_direction_gpio = Gpio::new().unwrap().get(24).unwrap().into_output();
+    let mut motor_direction_gpio = Gpio::new()
+        .unwrap()
+        .get(configuration.direction)
+        .unwrap()
+        .into_output();
     match direction {
         Direction::Open => motor_direction_gpio.set_high(),
         Direction::Close => motor_direction_gpio.set_low(),
     }
 
-    let mut motor_gpio = Gpio::new().unwrap().get(23).unwrap().into_output();
-    let mut motor_driver_gpio = Gpio::new().unwrap().get(25).unwrap().into_output();
+    let mut motor_gpio = Gpio::new()
+        .unwrap()
+        .get(configuration.pin)
+        .unwrap()
+        .into_output();
+    let mut motor_driver_gpio = Gpio::new()
+        .unwrap()
+        .get(configuration.driver)
+        .unwrap()
+        .into_output();
 
     const STEPPS: i64 = 32000;
     const PWM_SLEEP_TIME: u64 = 100;
@@ -55,8 +67,8 @@ pub fn run_motor(config: LockConfig, direction: Direction) {
 }
 
 #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
-pub fn run_motor(config: LockConfig, direction: Direction) {
-    dbg!(config);
+pub fn run_motor(configuration: LockMotorConfiguration, direction: Direction) {
+    dbg!(configuration);
     println!("Debug {direction:?}");
 
     let mut file = fs::File::options()

@@ -60,19 +60,18 @@ impl LockSwitch {
         target_env = "musl",
         target_os = "linux"
     ))]
-    pub fn new(configuration: &LockSwithccon) -> Self {
+    pub fn new(configuration: LockSwitchConfiguration) -> Self {
         Self {
-            // lockswitch_gpio: Gpio::new().unwrap().get(22).unwrap().into_input_pullup(),
             lockswitch_gpio: Gpio::new()
                 .unwrap()
-                .get(&configuration.pin)
+                .get(configuration.pin)
                 .unwrap()
                 .into_input_pullup(),
         }
     }
 
     #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
-    pub fn new(configuration: &LockSwitchConfiguration) -> Self {
+    pub fn new(configuration: LockSwitchConfiguration) -> Self {
         Self::check_state_file();
 
         dbg!(configuration);
