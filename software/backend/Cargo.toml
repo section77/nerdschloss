@@ -10,7 +10,7 @@ name = "nerdschloss"
 path = "src/main.rs"
 
 [build-dependencies]
-shadow-rs = "0.25"
+shadow-rs = "0.26"
 
 [dev-dependencies]
 pretty_assertions = "1"
@@ -19,7 +19,7 @@ pretty_assertions = "1"
 hardware = { path = "../hardware" }
 clap = { version = "4", features = ["derive", "cargo", "env", "unicode"] }
 dotenvy = "0.15"
-shadow-rs = "0.25"
+shadow-rs = "0.26"
 config = { version = "0.13", default-features = false, features = ["toml"] }
 directories-next = "2"
 serde = { version = "1", features = ["derive"] }
