@@ -71,11 +71,8 @@ impl DoorSwitch {
     }
 
     #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
-    pub fn new(configuration: DoorSwitchConfiguration) -> Self {
+    pub fn new(_configuration: DoorSwitchConfiguration) -> Self {
         Self::check_state_file();
-
-        dbg!(configuration);
-
         Self {}
     }
 
