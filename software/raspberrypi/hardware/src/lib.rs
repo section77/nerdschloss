@@ -11,4 +11,6 @@ pub use self::{
 };
 
 #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
-const STATE_FILE: &str = "/tmp/nerdschloss";
+const LOCKSWITCH_STATE_FILE: &str = "/tmp/nerdschloss/lockswitch";
+#[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
+const DOORSWITCH_STATE_FILE: &str = "/tmp/nerdschloss/doorswitch";

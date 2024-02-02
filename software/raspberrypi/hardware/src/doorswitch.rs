@@ -78,8 +78,8 @@ impl DoorSwitch {
 
     #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
     fn check_state_file() {
-        if fs::metadata(super::STATE_FILE).is_err() {
-            let mut file = fs::File::create(super::STATE_FILE).unwrap();
+        if fs::metadata(super::DOORSWITCH_STATE_FILE).is_err() {
+            let mut file = fs::File::create(super::DOORSWITCH_STATE_FILE).unwrap();
             write!(file, "false").unwrap();
         }
     }
@@ -100,7 +100,7 @@ impl DoorSwitchStateTrait for DoorSwitch {
 
     #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
     fn state(&self) -> DoorSwitchState {
-        let mut file = fs::File::open(super::STATE_FILE).unwrap();
+        let mut file = fs::File::open(super::DOORSWITCH_STATE_FILE).unwrap();
         let mut contents = String::new();
         file.read_to_string(&mut contents).unwrap();
         let s: bool = contents.trim().parse().unwrap();

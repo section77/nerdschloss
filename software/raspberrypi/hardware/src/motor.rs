@@ -74,7 +74,7 @@ pub fn run_motor(configuration: LockMotorConfiguration, direction: Direction) {
     let mut file = fs::File::options()
         .write(true)
         .truncate(true)
-        .open(super::STATE_FILE)
+        .open(super::LOCKSWITCH_STATE_FILE)
         .unwrap();
     match direction {
         Direction::Open => write!(file, "true").unwrap(),
