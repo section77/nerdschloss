@@ -3,7 +3,7 @@ use config::{Config, ConfigError, Environment, File};
 use directories_next::ProjectDirs;
 use serde::{Deserialize, Serialize};
 
-use hardware::{DoorSwitchConfiguration, LockMotorConfiguration, LockSwitchConfiguration};
+use hardware::{doorswitch, lock, lockswitch};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Server {
@@ -26,9 +26,9 @@ pub struct Configuration {
     pub spaceapi: SpaceAPI,
 
     // hardware
-    pub lockmotor: LockMotorConfiguration,
-    pub lockswitch: LockSwitchConfiguration,
-    pub doorswitch: DoorSwitchConfiguration,
+    pub lockmotor: lock::Configuration,
+    pub lockswitch: lockswitch::Configuration,
+    pub doorswitch: doorswitch::Configuration,
 }
 
 impl Configuration {

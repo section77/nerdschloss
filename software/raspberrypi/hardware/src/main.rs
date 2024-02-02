@@ -26,7 +26,6 @@ fn main() -> anyhow::Result<()> {
         dbg!(state);
     }
 
-    #[allow(unreachable_code)]
     Ok(())
 }
 

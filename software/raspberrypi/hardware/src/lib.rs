@@ -1,14 +1,9 @@
-mod doorswitch;
-mod lock;
-mod lockswitch;
+pub mod doorswitch;
+pub mod lock;
+pub mod lockswitch;
 mod motor;
 
-pub use self::{
-    doorswitch::{DoorSwitch, DoorSwitchConfiguration, DoorSwitchState, DoorSwitchStateTrait},
-    lock::{Lock, LockMotorConfiguration, LockState},
-    lockswitch::{LockSwitch, LockSwitchConfiguration, LockSwitchState, LockSwitchStateTrait},
-    motor::Direction,
-};
+pub use self::motor::Direction;
 
 #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
 const LOCKSWITCH_STATE_FILE: &str = "/tmp/nerdschloss/lockswitch";

@@ -1,16 +1,16 @@
 use serde::{Deserialize, Serialize};
 
-use crate::motor::{run_motor, Direction};
+use crate::motor::{run, Direction};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct LockMotorConfiguration {
+pub struct Configuration {
     pub pin: u8,
     pub direction: u8,
     pub driver: u8,
 }
 
 #[derive(Debug, Default, Clone, Copy)]
-pub enum LockState {
+pub enum State {
     #[default]
     Locked,
     Locking,
@@ -18,22 +18,21 @@ pub enum LockState {
     Unlocking,
 }
 
-impl std::convert::From<bool> for LockState {
+impl std::convert::From<bool> for State {
     fn from(b: bool) -> Self {
-        match b {
-            true => Self::Unlocked,
-            false => Self::Locked,
+        if b {
+            Self::Unlocked
+        } else {
+            Self::Locked
         }
     }
 }
 
-impl std::convert::From<LockState> for bool {
-    fn from(dls: LockState) -> Self {
+impl std::convert::From<State> for bool {
+    fn from(dls: State) -> Self {
         match dls {
-            LockState::Unlocked => true,
-            LockState::Unlocking => false,
-            LockState::Locked => false,
-            LockState::Locking => false,
+            State::Unlocked => true,
+            State::Unlocking | State::Locked | State::Locking => false,
         }
     }
 }
@@ -46,37 +45,38 @@ pub trait Unlockable {
     fn unlock(&self);
 }
 
-pub trait LockStateTrait {
-    fn state(&self) -> LockState;
+pub trait StateTrait {
+    fn state(&self) -> State;
 }
 
 #[derive(Debug, Clone, Copy)]
 pub struct Lock {
-    state: LockState,
-    configuration: LockMotorConfiguration,
+    state: State,
+    configuration: Configuration,
 }
 
 impl Lock {
-    pub fn new(configuration: LockMotorConfiguration) -> Self {
+    #[must_use]
+    pub fn new(configuration: Configuration) -> Self {
         Self {
-            state: LockState::Locked,
+            state: State::Locked,
             configuration,
         }
     }
 
     pub fn lock(&mut self) {
-        self.state = LockState::Locking;
-        run_motor(self.configuration, Direction::Close);
-        self.state = LockState::Locked;
+        self.state = State::Locking;
+        run(self.configuration, Direction::Close);
+        self.state = State::Locked;
     }
 
     pub fn unlock(&mut self) {
-        self.state = LockState::Unlocking;
-        run_motor(self.configuration, Direction::Open);
-        self.state = LockState::Unlocked;
+        self.state = State::Unlocking;
+        run(self.configuration, Direction::Open);
+        self.state = State::Unlocked;
     }
 
-    pub fn state(&self) -> LockState {
+    pub fn state(&self) -> State {
         self.state
     }
 }

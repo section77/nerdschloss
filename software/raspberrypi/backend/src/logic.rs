@@ -1,6 +1,6 @@
 use tokio::sync::mpsc::Receiver;
 
-use hardware::{Direction, DoorSwitch, Lock, LockSwitch, LockSwitchStateTrait};
+use hardware::{doorswitch, lock, lockswitch, lockswitch::StateTrait, Direction};
 
 use crate::configuration::{Configuration, SpaceAPI};
 
@@ -12,8 +12,7 @@ async fn spaceapi(spaceapi: &SpaceAPI, state: bool) {
     };
     match reqwest::Client::new()
         .put(format!(
-            "https://api.section77.de/set_door_status.php?status={}",
-            status
+            "https://api.section77.de/set_door_status.php?status={status}"
         ))
         .basic_auth(&spaceapi.username, Some(&spaceapi.password))
         .send()
@@ -21,15 +20,15 @@ async fn spaceapi(spaceapi: &SpaceAPI, state: bool) {
     {
         Ok(_) => (),
         Err(e) => {
-            eprintln!("Failed to set SpaceAPI: {:?}", e);
+            eprintln!("Failed to set SpaceAPI: {e:?}");
         }
     };
 }
 
 pub fn logic(configuration: Configuration, mut receiver: Receiver<Direction>) {
-    let lockswitch = LockSwitch::new(configuration.lockswitch);
-    let _doorswitch = DoorSwitch::new(configuration.doorswitch);
-    let mut lock = Lock::new(configuration.lockmotor);
+    let lockswitch = lockswitch::LockSwitch::new(configuration.lockswitch);
+    let _doorswitch = doorswitch::DoorSwitch::new(configuration.doorswitch);
+    let mut lock = lock::Lock::new(configuration.lockmotor);
     let mut is_open;
 
     loop {
