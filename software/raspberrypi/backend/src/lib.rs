@@ -16,6 +16,7 @@ use self::{
 #[folder = "../frontend/static/"]
 struct StaticFiles;
 
+#[tracing::instrument]
 pub fn setup(configuration: Configuration) -> anyhow::Result<Route, anyhow::Error> {
     // Create channel
     let (sender, receiver) = channel(1);

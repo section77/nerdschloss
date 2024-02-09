@@ -2,6 +2,9 @@ use anyhow::{Error, Result};
 use clap::Parser;
 use poem::{listener::TcpListener, Server};
 use shadow_rs::shadow;
+use tracing::instrument;
+use tracing_log::{AsTrace, LogTracer};
+use tracing_subscriber::FmtSubscriber;
 
 use backend::{configuration, setup};
 
@@ -11,14 +14,14 @@ shadow!(build);
 #[derive(Parser, Debug)]
 #[command(version, author, about, long_about)]
 struct Args {
-    #[clap(short, long)]
-    verbosity: Option<usize>,
     /// Show the configuration
     #[arg(short = 'c', long)]
     show_config: bool,
     /// Show build details
     #[arg(short = 'b', long)]
     show_build_details: bool,
+    #[command(flatten)]
+    verbose: clap_verbosity_flag::Verbosity,
     /// Enable the SpaceAPI
     #[arg(short, long)]
     spaceapi: bool,
@@ -38,8 +41,17 @@ fn load_configuration() -> Result<(configuration::Configuration, Args), Error> {
 }
 
 #[tokio::main]
+#[instrument]
 async fn main() -> Result<(), Error> {
     let (configuration, args) = load_configuration()?;
+
+    // Setup logging
+    LogTracer::init()?;
+    let subscriber = FmtSubscriber::builder()
+        .with_max_level(args.verbose.log_level_filter().as_trace())
+        .finish();
+    tracing::subscriber::set_global_default(subscriber)
+        .expect("Setting default tracing subscriber failed");
 
     if args.show_config {
         dbg!(&configuration);

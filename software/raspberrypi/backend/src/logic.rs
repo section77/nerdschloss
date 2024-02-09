@@ -1,9 +1,11 @@
 use tokio::sync::mpsc::Receiver;
 
 use hardware::{doorswitch, lock, lockswitch, lockswitch::StateTrait, Direction};
+use tracing::instrument;
 
 use crate::configuration::{Configuration, SpaceAPI};
 
+#[instrument]
 async fn spaceapi(spaceapi: &SpaceAPI, state: bool) {
     let status = if state {
         String::from("open")
@@ -25,6 +27,7 @@ async fn spaceapi(spaceapi: &SpaceAPI, state: bool) {
     };
 }
 
+#[instrument]
 pub fn logic(configuration: Configuration, mut receiver: Receiver<Direction>) {
     let lockswitch = lockswitch::LockSwitch::new(configuration.lockswitch);
     let _doorswitch = doorswitch::DoorSwitch::new(configuration.doorswitch);
