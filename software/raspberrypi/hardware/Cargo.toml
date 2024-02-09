@@ -9,6 +9,7 @@ edition = "2021"
 [dependencies]
 anyhow = "1"
 thiserror = "1"
+tracing = "0.1"
 serde = { version = "1", features = ["derive"] }
 
 [target.'cfg(all(any(target_arch = "arm", target_arch = "aarch64"), target_env = "musl", target_os = "linux"))'.dependencies]

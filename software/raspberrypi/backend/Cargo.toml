@@ -18,12 +18,17 @@ pretty_assertions = "1"
 [dependencies]
 hardware = { path = "../hardware" }
 clap = { version = "4", features = ["derive", "cargo", "env", "unicode"] }
+clap-verbosity-flag = "2"
 dotenvy = "0.15"
 shadow-rs = "0.26"
 config = { version = "0.13", default-features = false, features = ["toml"] }
+tracing = "0.1"
+tracing-log = "0.2.0"
+tracing-subscriber = "0.3"
+tracing-oslog = "0.1"
+tracing-journald = "0.3"
 directories-next = "2"
 serde = { version = "1", features = ["derive"] }
-tracing = "0.1"
 anyhow = "1"
 thiserror = "1"
 rust-embed = "8"
