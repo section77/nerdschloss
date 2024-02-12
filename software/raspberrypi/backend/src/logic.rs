@@ -6,17 +6,15 @@ use tracing::instrument;
 use crate::configuration::{Configuration, SpaceAPI};
 
 #[instrument]
-async fn spaceapi(spaceapi: &SpaceAPI, state: bool) {
+async fn spaceapi(configuration: &SpaceAPI, state: bool) {
     let status = if state {
         String::from("open")
     } else {
         String::from("closed")
     };
     match reqwest::Client::new()
-        .put(format!(
-            "https://api.section77.de/set_door_status.php?status={status}"
-        ))
-        .basic_auth(&spaceapi.username, Some(&spaceapi.password))
+        .put(format!("{}?status={status}", configuration.url))
+        .basic_auth(&configuration.username, Some(&configuration.password))
         .send()
         .await
     {
