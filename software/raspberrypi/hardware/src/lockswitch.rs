@@ -1,5 +1,5 @@
 #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
-use std::{fs, io::prelude::*};
+use std::{fs, io::prelude::*, path};
 
 use serde::{Deserialize, Serialize};
 
@@ -81,7 +81,12 @@ impl LockSwitch {
 
     #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
     fn check_state_file() {
-        if fs::metadata(super::LOCKSWITCH_STATE_FILE).is_err() {
+        let state_file = path::Path::new(super::LOCKSWITCH_STATE_FILE);
+        if !state_file.parent().unwrap().exists() {
+            fs::create_dir_all(state_file.parent().unwrap()).unwrap();
+        }
+
+        if fs::metadata(state_file).is_err() {
             let mut file = fs::File::create(super::LOCKSWITCH_STATE_FILE).unwrap();
             write!(file, "false").unwrap();
         }
