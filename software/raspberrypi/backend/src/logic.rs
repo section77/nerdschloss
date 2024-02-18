@@ -1,7 +1,7 @@
-use tokio::sync::mpsc::Receiver;
 
 use hardware::{doorswitch, lock, lockswitch, lockswitch::StateTrait, Direction};
-use tracing::instrument;
+use tokio::sync::mpsc::Receiver;
+use tracing::{error, instrument, warn};
 
 use crate::configuration::{Configuration, SpaceAPI};
 
@@ -20,7 +20,7 @@ async fn spaceapi(configuration: &SpaceAPI, state: bool) {
     {
         Ok(_) => (),
         Err(e) => {
-            eprintln!("Failed to set SpaceAPI: {e:?}");
+            error!("Failed to set SpaceAPI: {e:?}");
         }
     };
 }
