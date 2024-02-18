@@ -77,7 +77,7 @@ pub fn run(configuration: Configuration, direction: Direction) {
         .open(super::LOCKSWITCH_STATE_FILE)
         .unwrap();
     match direction {
-        Direction::Open => write!(file, "true").unwrap(),
-        Direction::Close => write!(file, "false").unwrap(),
+        Direction::Open => writeln!(file, "true").unwrap(),
+        Direction::Close => writeln!(file, "false").unwrap(),
     }
 }

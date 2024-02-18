@@ -88,7 +88,7 @@ impl DoorSwitch {
 
         if fs::metadata(super::DOORSWITCH_STATE_FILE).is_err() {
             let mut file = fs::File::create(super::DOORSWITCH_STATE_FILE).unwrap();
-            write!(file, "false").unwrap();
+            writeln!(file, "false").unwrap();
         }
     }
 }

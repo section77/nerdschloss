@@ -88,7 +88,7 @@ impl LockSwitch {
 
         if fs::metadata(state_file).is_err() {
             let mut file = fs::File::create(super::LOCKSWITCH_STATE_FILE).unwrap();
-            write!(file, "false").unwrap();
+            writeln!(file, "false").unwrap();
         }
     }
 }
