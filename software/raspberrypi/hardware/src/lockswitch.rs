@@ -111,8 +111,6 @@ impl StateTrait for LockSwitch {
         let mut file = fs::File::open(super::LOCKSWITCH_STATE_FILE).unwrap();
         let mut contents = String::new();
         file.read_to_string(&mut contents).unwrap();
-        let s: bool = contents.trim().parse().unwrap();
-
-        s.into()
+        contents.trim().parse::<bool>().unwrap().into()
     }
 }
