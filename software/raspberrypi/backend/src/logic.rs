@@ -1,7 +1,7 @@
+use tokio::sync::mpsc::Receiver;
+use tracing::{error, info, instrument, warn};
 
 use hardware::{doorswitch, lock, lockswitch, lockswitch::StateTrait, Direction};
-use tokio::sync::mpsc::Receiver;
-use tracing::{error, instrument, warn};
 
 use crate::configuration::{Configuration, SpaceAPI};
 
@@ -12,15 +12,18 @@ async fn spaceapi(configuration: &SpaceAPI, state: bool) {
     } else {
         String::from("closed")
     };
+    info!("Set SpaceAPI status");
     match reqwest::Client::new()
         .put(format!("{}?status={status}", configuration.url))
         .basic_auth(&configuration.username, Some(&configuration.password))
         .send()
         .await
     {
-        Ok(_) => (),
+        Ok(_) => {
+            info!("Successfully set SpaceAPI status");
+        }
         Err(e) => {
-            error!("Failed to set SpaceAPI: {e:?}");
+            error!("Failed to set SpaceAPI status: {e:?}");
         }
     };
 }
@@ -40,13 +43,13 @@ pub fn logic(configuration: Configuration, mut receiver: Receiver<Direction>) {
         match msg {
             Direction::Open => {
                 if !is_open {
-                    println!("Opening ...");
+                    info!("Opening ...");
                     lock.unlock();
                 }
             }
             Direction::Close => {
                 if is_open {
-                    println!("Closing ...");
+                    info!("Closing ...");
                     lock.lock();
                 }
             }
