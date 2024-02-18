@@ -1,25 +1,26 @@
 use anyhow::Result;
 use config::{Config, ConfigError, Environment, File};
 use directories_next::ProjectDirs;
-use serde::{Deserialize, Serialize};
+use secrecy::Secret;
+use serde::Deserialize;
 
 use hardware::{doorswitch, lock, lockswitch};
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Deserialize)]
 pub struct Server {
     pub ipaddress: std::net::IpAddr,
     pub port: u16,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct SpaceAPI {
     pub enable: bool,
     pub url: String,
     pub username: String,
-    pub password: String,
+    pub password: Secret<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct Configuration {
     pub server: Server,
 

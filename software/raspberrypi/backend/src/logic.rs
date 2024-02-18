@@ -1,3 +1,4 @@
+use secrecy::ExposeSecret;
 use tokio::sync::mpsc::Receiver;
 use tracing::{error, info, instrument, warn};
 
@@ -15,7 +16,10 @@ async fn spaceapi(configuration: &SpaceAPI, state: bool) {
     info!("Set SpaceAPI status");
     match reqwest::Client::new()
         .put(format!("{}?status={status}", configuration.url))
-        .basic_auth(&configuration.username, Some(&configuration.password))
+        .basic_auth(
+            &configuration.username,
+            Some(&configuration.password.expose_secret()),
+        )
         .send()
         .await
     {
