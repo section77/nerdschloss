@@ -63,12 +63,18 @@ impl LockSwitch {
         target_os = "linux"
     ))]
     pub fn new(configuration: Configuration) -> Self {
+        let mut gpio = Gpio::new()
+            .unwrap()
+            .get(configuration.pin)
+            .unwrap()
+            .into_input_pullup();
+        gpio.set_async_interrupt(rppal::gpio::Trigger::Both, |level| {
+            // println!("LockSwitchState: {level:?}");
+            tracing::info!("LockSwitchState: {level:?}");
+        })
+        .unwrap();
         Self {
-            lockswitch_gpio: Gpio::new()
-                .unwrap()
-                .get(configuration.pin)
-                .unwrap()
-                .into_input_pullup(),
+            lockswitch_gpio: gpio,
         }
     }
 

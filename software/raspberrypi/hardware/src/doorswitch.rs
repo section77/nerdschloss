@@ -63,12 +63,18 @@ impl DoorSwitch {
         target_os = "linux"
     ))]
     pub fn new(configuration: Configuration) -> Self {
+        let mut gpio = Gpio::new()
+            .unwrap()
+            .get(configuration.pin)
+            .unwrap()
+            .into_input_pullup();
+        gpio.set_async_interrupt(rppal::gpio::Trigger::Both, |level| {
+            // println!("DoorSwitchState: {level:?}");
+            tracing::info!("DoorSwitchState: {level:?}");
+        })
+        .unwrap();
         Self {
-            doorswitch_gpio: Gpio::new()
-                .unwrap()
-                .get(configuration.pin)
-                .unwrap()
-                .into_input_pullup(),
+            doorswitch_gpio: gpio,
         }
     }
 
