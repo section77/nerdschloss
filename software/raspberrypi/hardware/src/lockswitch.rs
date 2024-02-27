@@ -31,6 +31,7 @@ use tracing::info;
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Configuration {
     pub pin: u8,
+    pub interruptdelay: u64,
 }
 
 #[derive(Debug, Default, Clone, Copy)]
@@ -80,7 +81,7 @@ impl LockSwitch {
         target_os = "linux"
     ))]
     pub fn new(configuration: Configuration) -> Self {
-        let delay = Duration::from_millis(10);
+        let delay = Duration::from_millis(configuration.interruptdelay);
         let debouncer = EventDebouncer::new(delay, move |level: Level| {
             info!("Debounced Interrupt LockSwitchState: {level:?}");
         });
@@ -91,7 +92,7 @@ impl LockSwitch {
             .unwrap()
             .into_input_pullup();
         gpio.set_async_interrupt(rppal::gpio::Trigger::Both, move |level| {
-            info!("Interrupt LockSwitchState: {level:?}");
+            // info!("Interrupt LockSwitchState: {level:?}");
             debouncer.put(level);
         })
         .unwrap();
