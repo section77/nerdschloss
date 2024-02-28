@@ -82,7 +82,7 @@ impl LockSwitch {
     ))]
     pub fn new(configuration: Configuration) -> Self {
         let delay = Duration::from_millis(configuration.interruptdelay);
-        let debouncer = EventDebouncer::new(delay, move |level: Level| {
+        let debouncer = EventDebouncer::new(delay, |level: Level| {
             info!("Debounced Interrupt LockSwitchState: {level:?}");
         });
 
