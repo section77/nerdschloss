@@ -82,8 +82,8 @@ impl LockSwitch {
     ))]
     pub fn new(configuration: Configuration) -> Self {
         let delay = Duration::from_millis(configuration.interruptdelay);
-        let debouncer = EventDebouncer::new(delay, |level: Level| {
-            info!("Debounced Interrupt LockSwitchState: {level:?}");
+        let debouncer = EventDebouncer::new(delay, |v: ()| {
+            info!("Debounced Interrupt LockSwitchState: {v:?}");
         });
 
         let mut gpio = Gpio::new()
@@ -91,9 +91,9 @@ impl LockSwitch {
             .get(configuration.pin)
             .unwrap()
             .into_input_pullup();
-        gpio.set_async_interrupt(rppal::gpio::Trigger::Both, move |level| {
+        gpio.set_async_interrupt(rppal::gpio::Trigger::Both, move |_| {
             // info!("Interrupt LockSwitchState: {level:?}");
-            debouncer.put(level);
+            debouncer.put(());
         })
         .unwrap();
 

@@ -83,8 +83,8 @@ impl DoorSwitch {
     ))]
     pub fn new(configuration: Configuration) -> Self {
         let delay = Duration::from_millis(configuration.interruptdelay);
-        let debouncer = EventDebouncer::new(delay, |level: Level| {
-            info!("Debounced Interrupt DoorSwitchState: {level:?}");
+        let debouncer = EventDebouncer::new(delay, |v: ()| {
+            info!("Debounced Interrupt DoorSwitchState: {v:?}");
         });
 
         let mut gpio = Gpio::new()
@@ -92,9 +92,9 @@ impl DoorSwitch {
             .get(configuration.pin)
             .unwrap()
             .into_input_pullup();
-        gpio.set_async_interrupt(rppal::gpio::Trigger::Both, move |level| {
+        gpio.set_async_interrupt(rppal::gpio::Trigger::Both, move |_| {
             // info!("Interrupt DoorSwitchState: {level:?}");
-            debouncer.put(level);
+            debouncer.put(());
         })
         .unwrap();
 
