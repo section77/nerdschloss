@@ -1,32 +1,32 @@
-#[cfg(all(
-    any(target_arch = "arm", target_arch = "aarch64"),
-    target_env = "musl",
-    target_os = "linux"
-))]
-use std::time::Duration;
+// #[cfg(all(
+//     any(target_arch = "arm", target_arch = "aarch64"),
+//     target_env = "musl",
+//     target_os = "linux"
+// ))]
+// use std::time::Duration;
 #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
 use std::{fs, io::prelude::*, path};
 
 use serde::{Deserialize, Serialize};
 
-#[cfg(all(
-    any(target_arch = "arm", target_arch = "aarch64"),
-    target_env = "musl",
-    target_os = "linux"
-))]
-use debounce::EventDebouncer;
+// #[cfg(all(
+//     any(target_arch = "arm", target_arch = "aarch64"),
+//     target_env = "musl",
+//     target_os = "linux"
+// ))]
+// use debounce::EventDebouncer;
 #[cfg(all(
     any(target_arch = "arm", target_arch = "aarch64"),
     target_env = "musl",
     target_os = "linux"
 ))]
 use rppal::gpio::{Gpio, InputPin, Level};
-#[cfg(all(
-    any(target_arch = "arm", target_arch = "aarch64"),
-    target_env = "musl",
-    target_os = "linux"
-))]
-use tracing::info;
+// #[cfg(all(
+//     any(target_arch = "arm", target_arch = "aarch64"),
+//     target_env = "musl",
+//     target_os = "linux"
+// ))]
+// use tracing::info;
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Configuration {
@@ -81,21 +81,21 @@ impl LockSwitch {
         target_os = "linux"
     ))]
     pub fn new(configuration: Configuration) -> Self {
-        let delay = Duration::from_millis(configuration.interruptdelay);
-        let debouncer = EventDebouncer::new(delay, |v: ()| {
-            info!("Debounced Interrupt LockSwitchState: {v:?}");
-        });
+        // let delay = Duration::from_millis(configuration.interruptdelay);
+        // let debouncer = EventDebouncer::new(delay, |v: ()| {
+        //     info!("Debounced Interrupt LockSwitchState: {v:?}");
+        // });
 
-        let mut gpio = Gpio::new()
+        let gpio = Gpio::new()
             .unwrap()
             .get(configuration.pin)
             .unwrap()
             .into_input_pullup();
-        gpio.set_async_interrupt(rppal::gpio::Trigger::Both, move |_| {
-            // info!("Interrupt LockSwitchState: {level:?}");
-            debouncer.put(());
-        })
-        .unwrap();
+        // gpio.set_async_interrupt(rppal::gpio::Trigger::Both, move |level| {
+        //     info!("Interrupt LockSwitchState: {level:?}");
+        //     // debouncer.put(());
+        // })
+        // .unwrap();
 
         Self {
             lockswitch_gpio: gpio,
