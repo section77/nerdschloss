@@ -1,32 +1,14 @@
-// #[cfg(all(
-//     any(target_arch = "arm", target_arch = "aarch64"),
-//     target_env = "musl",
-//     target_os = "linux"
-// ))]
-// use std::time::Duration;
 #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
 use std::{fs, io::prelude::*, path};
 
 use serde::{Deserialize, Serialize};
 
-// #[cfg(all(
-//     any(target_arch = "arm", target_arch = "aarch64"),
-//     target_env = "musl",
-//     target_os = "linux"
-// ))]
-// use debounce::EventDebouncer;
 #[cfg(all(
     any(target_arch = "arm", target_arch = "aarch64"),
     target_env = "musl",
     target_os = "linux"
 ))]
 use rppal::gpio::{Gpio, InputPin, Level};
-// #[cfg(all(
-//     any(target_arch = "arm", target_arch = "aarch64"),
-//     target_env = "musl",
-//     target_os = "linux"
-// ))]
-// use tracing::info;
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Configuration {
@@ -82,21 +64,21 @@ impl DoorSwitch {
         target_os = "linux"
     ))]
     pub fn new(configuration: Configuration) -> Self {
-        // let delay = Duration::from_millis(configuration.interruptdelay);
-        // let debouncer = EventDebouncer::new(delay, |v: ()| {
-        //     info!("Debounced Interrupt DoorSwitchState: {v:?}");
-        // });
+        let delay = std::time::Duration::from_millis(configuration.interruptdelay);
+        let debouncer = debounce::EventDebouncer::new(delay, |v: ()| {
+            tracing::info!("Debounced Interrupt DoorSwitchState: {v:?}");
+        });
 
-        let gpio = Gpio::new()
+        let mut gpio = Gpio::new()
             .unwrap()
             .get(configuration.pin)
             .unwrap()
             .into_input_pullup();
-        // gpio.set_async_interrupt(rppal::gpio::Trigger::Both, move |level| {
-        //     info!("Interrupt DoorSwitchState: {level:?}");
-        //     // debouncer.put(());
-        // })
-        // .unwrap();
+        gpio.set_async_interrupt(rppal::gpio::Trigger::Both, move |_| {
+            // tracing::info!("Interrupt DoorSwitchState: {level:?}");
+            debouncer.put(());
+        })
+        .unwrap();
 
         Self {
             doorswitch_gpio: gpio,
