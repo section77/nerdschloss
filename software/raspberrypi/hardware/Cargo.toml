@@ -14,3 +14,4 @@ serde = { version = "1", features = ["derive"] }
 
 [target.'cfg(all(any(target_arch = "arm", target_arch = "aarch64"), target_env = "musl", target_os = "linux"))'.dependencies]
 rppal = { version = "0.17", features = ["hal"] }
+debounce = "0.2"
