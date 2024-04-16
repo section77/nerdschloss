@@ -35,14 +35,5 @@ pub fn logic(
                 }
             }
         }
-
-        // if configuration.spaceapi.enable {
-        //     let spaceapi_configuration = configuration.spaceapi.clone();
-        //     let state = lockswitch.state().into();
-
-        //     tokio::task::spawn(async move {
-        //         spaceapi(&spaceapi_configuration, state).await;
-        //     });
-        // }
     }
 }
