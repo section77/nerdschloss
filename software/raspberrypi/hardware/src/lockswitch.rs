@@ -70,7 +70,7 @@ impl LockSwitch {
         target_env = "musl",
         target_os = "linux"
     ))]
-    pub fn new(configuration: Configuration) -> Self {
+    pub fn new(configuration: Configuration, sender: tokio::sync::mpsc::Sender<bool>) -> Self {
         let gpio = Arc::new(RwLock::new(
             Gpio::new()
                 .unwrap()
@@ -82,10 +82,13 @@ impl LockSwitch {
         let g = gpio.clone();
         let delay = std::time::Duration::from_millis(configuration.interruptdelay);
         let debouncer = debounce::EventDebouncer::new(delay, move |_| {
-            tracing::debug!(
-                "Debounced Interrupt LockSwitchState: {:?}",
-                g.read().unwrap().read()
-            );
+            let state = g.read().unwrap().read();
+            tracing::debug!("Debounced Interrupt LockSwitchState: {:?}", state);
+            let state = match state {
+                Level::High => true,
+                Level::Low => false,
+            };
+            sender.blocking_send(state).unwrap();
         });
 
         gpio.write()
