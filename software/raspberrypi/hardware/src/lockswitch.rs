@@ -1,6 +1,13 @@
 #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
 use std::{fs, io::prelude::*, path};
 
+#[cfg(all(
+    any(target_arch = "arm", target_arch = "aarch64"),
+    target_env = "musl",
+    target_os = "linux"
+))]
+use std::sync::{Arc, RwLock};
+
 use serde::{Deserialize, Serialize};
 
 #[cfg(all(
@@ -53,7 +60,7 @@ pub struct LockSwitch {
         target_env = "musl",
         target_os = "linux"
     ))]
-    lockswitch_gpio: InputPin,
+    lockswitch_gpio: Arc<RwLock<InputPin>>,
 }
 
 impl LockSwitch {
@@ -64,21 +71,30 @@ impl LockSwitch {
         target_os = "linux"
     ))]
     pub fn new(configuration: Configuration) -> Self {
+        let gpio = Arc::new(RwLock::new(
+            Gpio::new()
+                .unwrap()
+                .get(configuration.pin)
+                .unwrap()
+                .into_input_pullup(),
+        ));
+
+        let g = gpio.clone();
         let delay = std::time::Duration::from_millis(configuration.interruptdelay);
-        let debouncer = debounce::EventDebouncer::new(delay, |v: ()| {
-            tracing::info!("Debounced Interrupt LockSwitchState: {v:?}");
+        let debouncer = debounce::EventDebouncer::new(delay, move |_| {
+            tracing::debug!(
+                "Debounced Interrupt LockSwitchState: {:?}",
+                g.read().unwrap().read()
+            );
         });
 
-        let mut gpio = Gpio::new()
+        gpio.write()
             .unwrap()
-            .get(configuration.pin)
-            .unwrap()
-            .into_input_pullup();
-        gpio.set_async_interrupt(rppal::gpio::Trigger::Both, move |_| {
-            // tracing::info!("Interrupt LockSwitchState: {level:?}");
-            debouncer.put(());
-        })
-        .unwrap();
+            .set_async_interrupt(rppal::gpio::Trigger::Both, move |_| {
+                // tracing::debug!("Interrupt LockSwitchState: {level:?}");
+                debouncer.put(());
+            })
+            .unwrap();
 
         Self {
             lockswitch_gpio: gpio,
@@ -113,7 +129,8 @@ impl StateTrait for LockSwitch {
         target_os = "linux"
     ))]
     fn state(&self) -> State {
-        match &self.lockswitch_gpio.read() {
+        let value = &self.lockswitch_gpio.read().unwrap().read();
+        match value {
             Level::Low => State::Locked,
             Level::High => State::Unlocked,
         }
