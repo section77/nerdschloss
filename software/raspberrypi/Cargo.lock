@@ -702,6 +702,7 @@ dependencies = [
  "rppal",
  "serde",
  "thiserror",
+ "tokio",
  "tracing",
 ]
 

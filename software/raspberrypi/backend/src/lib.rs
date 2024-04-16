@@ -1,6 +1,7 @@
 pub mod configuration;
 mod handlers;
 mod logic;
+mod notify;
 
 use poem::{endpoint::EmbeddedFileEndpoint, get, EndpointExt, Route};
 use tokio::sync::mpsc::channel;
@@ -21,9 +22,13 @@ pub fn setup(configuration: Configuration) -> anyhow::Result<Route, anyhow::Erro
     // Create channel
     let (sender, receiver) = channel(1);
 
+    let (spaceapi_sender, spaceapi_receiver) = channel(1);
+    let spaceapi_config = configuration.spaceapi.clone();
+    tokio::spawn(async move { notify::spaceapi(&spaceapi_config, spaceapi_receiver).await });
+
     // Start logic stuff
     tokio::task::spawn_blocking(|| {
-        logic(configuration, receiver);
+        logic(configuration, receiver, spaceapi_sender);
     });
 
     // Setup the routs
