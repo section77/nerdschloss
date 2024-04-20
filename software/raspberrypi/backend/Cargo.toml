@@ -43,4 +43,6 @@ poem = { version = "3", features = [
 reqwest = { version = "0.12", default_features = false, features = [
     "rustls-tls",
 ] }
+reqwest-retry = "0.5"
+reqwest-middleware = "0.3"
 secrecy = { version = "0.8", features = ["serde"] }
