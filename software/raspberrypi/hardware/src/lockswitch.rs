@@ -106,7 +106,7 @@ impl LockSwitch {
 
     #[must_use]
     #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
-    pub fn new(_configuration: Configuration) -> Self {
+    pub fn new(_configuration: Configuration, _sender: tokio::sync::mpsc::Sender<bool>) -> Self {
         Self::check_state_file();
         Self {}
     }
