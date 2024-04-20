@@ -1,3 +1,5 @@
+use reqwest_middleware::ClientBuilder;
+use reqwest_retry::{policies::ExponentialBackoff, RetryTransientMiddleware};
 use secrecy::ExposeSecret;
 use tokio::sync::mpsc::Receiver;
 use tracing::{error, info};
@@ -13,8 +15,15 @@ pub async fn spaceapi(configuration: &SpaceAPI, mut receiver: Receiver<bool>) {
             } else {
                 String::from("closed")
             };
+
             info!("Set SpaceAPI status");
-            match reqwest::Client::new()
+
+            let retry_policy = ExponentialBackoff::builder().build_with_max_retries(5);
+            let client = ClientBuilder::new(reqwest::Client::new())
+                .with(RetryTransientMiddleware::new_with_policy(retry_policy))
+                .build();
+
+            match client
                 .put(format!("{}?status={status}", configuration.url))
                 .basic_auth(
                     &configuration.username,
