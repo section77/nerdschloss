@@ -1,12 +1,12 @@
 use tokio::sync::mpsc::{Receiver, Sender};
-use tracing::{info, instrument, warn};
+use tracing::{info, instrument};
 
 use hardware::{doorswitch, lock, lockswitch, lockswitch::StateTrait, Direction};
 
 use crate::configuration::Configuration;
 
 #[instrument]
-pub fn logic(
+pub async fn logic(
     configuration: Configuration,
     mut receiver: Receiver<Direction>,
     spaceapi_sender: Sender<bool>,
@@ -16,10 +16,7 @@ pub fn logic(
     let mut lock = lock::Lock::new(configuration.lockmotor);
     let mut is_open;
 
-    loop {
-        let Some(msg) = receiver.blocking_recv() else {
-            continue;
-        };
+    while let Some(msg) = receiver.recv().await {
         is_open = bool::from(lockswitch.state());
         match msg {
             Direction::Open => {

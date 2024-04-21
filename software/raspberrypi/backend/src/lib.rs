@@ -19,17 +19,15 @@ struct StaticFiles;
 
 #[tracing::instrument]
 pub fn setup(configuration: Configuration) -> anyhow::Result<Route, anyhow::Error> {
-    // Create channel
-    let (sender, receiver) = channel(1);
-
     let (spaceapi_sender, spaceapi_receiver) = channel(1);
     let spaceapi_config = configuration.spaceapi.clone();
     tokio::spawn(async move { notify::spaceapi(&spaceapi_config, spaceapi_receiver).await });
 
+    // Create channel
+    let (sender, receiver) = channel(1);
+
     // Start logic stuff
-    tokio::task::spawn_blocking(|| {
-        logic(configuration, receiver, spaceapi_sender);
-    });
+    tokio::task::spawn(async move { logic(configuration, receiver, spaceapi_sender).await });
 
     // Setup the routs
     let routes = Route::new()
