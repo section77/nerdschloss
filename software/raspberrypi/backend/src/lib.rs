@@ -3,8 +3,11 @@ mod handlers;
 mod logic;
 mod notify;
 
-use poem::{endpoint::EmbeddedFileEndpoint, get, EndpointExt, Route};
-use tokio::sync::mpsc::channel;
+use anyhow::Result;
+use poem::{
+    endpoint::EmbeddedFileEndpoint, get, listener::TcpListener, EndpointExt, Route, Server,
+};
+use tokio::sync::mpsc::{channel, Sender};
 
 use self::{
     configuration::Configuration,
@@ -17,18 +20,7 @@ use self::{
 #[folder = "../frontend/static/"]
 struct StaticFiles;
 
-#[tracing::instrument]
-pub fn setup(configuration: Configuration) -> anyhow::Result<Route, anyhow::Error> {
-    let (spaceapi_sender, spaceapi_receiver) = channel(1);
-    let spaceapi_config = configuration.spaceapi.clone();
-    tokio::spawn(async move { notify::spaceapi(&spaceapi_config, spaceapi_receiver).await });
-
-    // Create channel
-    let (sender, receiver) = channel(1);
-
-    // Start logic stuff
-    tokio::task::spawn(async move { logic(configuration, receiver, spaceapi_sender).await });
-
+pub fn setup_routes(sender: Sender<hardware::Direction>) -> Result<Route> {
     // Setup the routs
     let routes = Route::new()
         .at("/", EmbeddedFileEndpoint::<StaticFiles>::new("index.html"))
@@ -37,4 +29,29 @@ pub fn setup(configuration: Configuration) -> anyhow::Result<Route, anyhow::Erro
         .at("/close", get(close).data(sender));
 
     Ok(routes)
+}
+
+pub async fn run(configuration: &Configuration) -> anyhow::Result<()> {
+    // Create channel
+    let (spaceapi_sender, spaceapi_receiver) = channel(1);
+    let (sender, receiver) = channel(1);
+
+    // Listen for new connections
+    let listener = TcpListener::bind(std::net::SocketAddr::new(
+        configuration.server.ipaddress,
+        configuration.server.port,
+    ));
+
+    let spaceapi_configuration = configuration.spaceapi.clone();
+    tokio::spawn(async move { notify::spaceapi(&spaceapi_configuration, spaceapi_receiver).await });
+
+    let configuration = configuration.clone();
+    tokio::spawn(async move { logic(&configuration.clone(), receiver, spaceapi_sender).await });
+
+    // Serve the application
+    let server = Server::new(listener);
+    let route = setup_routes(sender)?;
+    server.run(route).await?;
+
+    Ok(())
 }

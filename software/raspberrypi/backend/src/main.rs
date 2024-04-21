@@ -1,12 +1,11 @@
 use anyhow::{Error, Result};
 use clap::Parser;
-use poem::{listener::TcpListener, Server};
 use shadow_rs::shadow;
 use tracing::instrument;
 use tracing_log::{AsTrace, LogTracer};
 use tracing_subscriber::FmtSubscriber;
 
-use backend::{configuration, setup};
+use backend::{configuration, run};
 
 shadow!(build);
 
@@ -62,15 +61,7 @@ async fn main() -> Result<(), Error> {
         return Ok(());
     }
 
-    // Listen for new connections
-    let listener = TcpListener::bind(std::net::SocketAddr::new(
-        configuration.server.ipaddress,
-        configuration.server.port,
-    ));
+    run(&configuration).await?;
 
-    // Serve the application
-    let server = Server::new(listener);
-    let route = setup(configuration)?;
-    server.run(route).await?;
     Ok(())
 }

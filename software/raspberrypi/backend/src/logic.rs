@@ -1,13 +1,12 @@
 use tokio::sync::mpsc::{Receiver, Sender};
-use tracing::{info, instrument};
+use tracing::info;
 
 use hardware::{doorswitch, lock, lockswitch, lockswitch::StateTrait, Direction};
 
 use crate::configuration::Configuration;
 
-#[instrument]
 pub async fn logic(
-    configuration: Configuration,
+    configuration: &Configuration,
     mut receiver: Receiver<Direction>,
     spaceapi_sender: Sender<bool>,
 ) {
