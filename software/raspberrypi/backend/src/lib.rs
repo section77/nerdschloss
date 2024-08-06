@@ -1,7 +1,7 @@
 pub mod configuration;
 mod handlers;
 mod logic;
-mod notify;
+mod notifyer;
 
 use anyhow::Result;
 use poem::{
@@ -43,7 +43,7 @@ pub async fn run(configuration: &Configuration) -> anyhow::Result<()> {
     ));
 
     let spaceapi_configuration = configuration.spaceapi.clone();
-    tokio::spawn(async move { notify::spaceapi(&spaceapi_configuration, spaceapi_receiver).await });
+    tokio::spawn(async move { notifyer::notify(&spaceapi_configuration, spaceapi_receiver).await });
 
     let configuration = configuration.clone();
     tokio::spawn(async move { logic(&configuration.clone(), receiver, spaceapi_sender).await });

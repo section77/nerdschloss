@@ -40,7 +40,7 @@ poem = { version = "3", features = [
     "embed",
     "tokio-metrics",
 ] }
-reqwest = { version = "0.12", default_features = false, features = [
+reqwest = { version = "0.12", default-features = false, features = [
     "rustls-tls",
 ] }
 reqwest-retry = "0.5"
