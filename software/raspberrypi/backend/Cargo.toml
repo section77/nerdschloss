@@ -10,7 +10,7 @@ name = "nerdschloss"
 path = "src/main.rs"
 
 [build-dependencies]
-shadow-rs = "0.27"
+shadow-rs = "0.31"
 
 [dev-dependencies]
 pretty_assertions = "1"
@@ -20,7 +20,7 @@ hardware = { path = "../hardware" }
 clap = { version = "4", features = ["derive", "cargo", "env", "unicode"] }
 clap-verbosity-flag = "2"
 dotenvy = "0.15"
-shadow-rs = "0.27"
+shadow-rs = "0.31"
 config = { version = "0.14", default-features = false, features = ["toml"] }
 tracing = "0.1"
 tracing-log = "0.2.0"
@@ -43,6 +43,6 @@ poem = { version = "3", features = [
 reqwest = { version = "0.12", default-features = false, features = [
     "rustls-tls",
 ] }
-reqwest-retry = "0.5"
+reqwest-retry = "0.6"
 reqwest-middleware = "0.3"
 secrecy = { version = "0.8", features = ["serde"] }
