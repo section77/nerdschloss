@@ -1,21 +1,15 @@
 #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
 use std::{fs, io::prelude::*, path};
 
-#[cfg(all(
-    any(target_arch = "arm", target_arch = "aarch64"),
-    target_env = "musl",
-    target_os = "linux"
-))]
-use std::sync::{Arc, RwLock};
-
 use serde::{Deserialize, Serialize};
+use tracing::{debug, error};
 
 #[cfg(all(
     any(target_arch = "arm", target_arch = "aarch64"),
     target_env = "musl",
     target_os = "linux"
 ))]
-use rppal::gpio::{Gpio, InputPin, Level};
+use rppal::gpio::{Gpio, InputPin, Level, Trigger};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Configuration {
@@ -60,7 +54,7 @@ pub struct LockSwitch {
         target_env = "musl",
         target_os = "linux"
     ))]
-    lockswitch_gpio: Arc<RwLock<InputPin>>,
+    lockswitch_gpio: InputPin,
 }
 
 impl LockSwitch {
@@ -71,33 +65,27 @@ impl LockSwitch {
         target_os = "linux"
     ))]
     pub fn new(configuration: Configuration, sender: tokio::sync::mpsc::Sender<bool>) -> Self {
-        let gpio = Arc::new(RwLock::new(
-            Gpio::new()
-                .unwrap()
-                .get(configuration.pin)
-                .unwrap()
-                .into_input_pullup(),
-        ));
+        let mut gpio = Gpio::new()
+            .unwrap()
+            .get(configuration.pin)
+            .unwrap()
+            .into_input_pullup();
 
-        let g = gpio.clone();
         let delay = std::time::Duration::from_millis(configuration.interruptdelay);
-        let debouncer = debounce::EventDebouncer::new(delay, move |_| {
-            let state = g.read().unwrap().read();
-            tracing::debug!("Debounced Interrupt LockSwitchState: {:?}", state);
-            let state = match state {
-                Level::High => true,
-                Level::Low => false,
+
+        gpio.set_async_interrupt(rppal::gpio::Trigger::Both, Some(delay), move |event| {
+            debug!("Interrupt LockSwitchState: {event:?}");
+            let state = match event.trigger {
+                Trigger::RisingEdge => true,
+                Trigger::FallingEdge => false,
+                s => {
+                    error!("Trigger value is not supported {s}");
+                    false
+                }
             };
             sender.blocking_send(state).unwrap();
-        });
-
-        gpio.write()
-            .unwrap()
-            .set_async_interrupt(rppal::gpio::Trigger::Both, move |_| {
-                // tracing::debug!("Interrupt LockSwitchState: {level:?}");
-                debouncer.put(());
-            })
-            .unwrap();
+        })
+        .unwrap();
 
         Self {
             lockswitch_gpio: gpio,
@@ -235,7 +223,7 @@ impl StateTrait for LockSwitch {
         target_os = "linux"
     ))]
     fn state(&self) -> State {
-        let value = &self.lockswitch_gpio.read().unwrap().read();
+        let value = &self.lockswitch_gpio.read();
         match value {
             Level::Low => State::Locked,
             Level::High => State::Unlocked,
