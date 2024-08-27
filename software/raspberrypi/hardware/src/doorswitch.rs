@@ -2,6 +2,12 @@
 use std::{fs, io::prelude::*, path};
 
 use serde::{Deserialize, Serialize};
+
+#[cfg(all(
+    any(target_arch = "arm", target_arch = "aarch64"),
+    target_env = "musl",
+    target_os = "linux"
+))]
 use tracing::debug;
 
 #[cfg(all(
