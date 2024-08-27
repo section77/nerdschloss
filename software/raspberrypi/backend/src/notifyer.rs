@@ -81,7 +81,7 @@ async fn spaceapi(configuration: &SpaceAPI, state: bool) {
 pub async fn notify(configuration: &SpaceAPI, mut receiver: Receiver<bool>) {
     while let Some(state) = receiver.recv().await {
         // let mqtt = mqtt(state);
-        let _spaceapi = spaceapi(configuration, state);
+        let _spaceapi = spaceapi(configuration, state).await;
         // tokio::join!(mqtt, spaceapi);
     }
 }
