@@ -1,7 +1,7 @@
 use anyhow::Result;
 use config::{Config, ConfigError, Environment, File};
 use directories_next::ProjectDirs;
-use secrecy::Secret;
+use secrecy::SecretString;
 use serde::Deserialize;
 
 use hardware::{doorswitch, lock, lockswitch};
@@ -17,7 +17,7 @@ pub struct SpaceAPI {
     pub enable: bool,
     pub url: String,
     pub username: String,
-    pub password: Secret<String>,
+    pub password: SecretString,
 }
 
 #[derive(Debug, Clone, Deserialize)]
