@@ -18,7 +18,7 @@ rppal = "0.19"
 
 [target.'cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))'.dependencies]
 chrono = "0.4"
-notify = { version = "6", default-features = false, features = [
+notify = { version = "7", default-features = false, features = [
     "macos_kqueue",
 ] }
-notify-debouncer-full = { version = "0.3", default-features = false }
+notify-debouncer-full = { version = "0.4", default-features = false }
