@@ -214,9 +214,8 @@ impl LockSwitch {
             fs::create_dir_all(state_file.parent().unwrap()).unwrap();
         }
 
-        let mut file;
         if fs::metadata(state_file).is_err() {
-            file = fs::File::create(super::LOCKSWITCH_STATE_FILE).unwrap();
+            let mut file = fs::File::create(super::LOCKSWITCH_STATE_FILE).unwrap();
             writeln!(file, "false").unwrap();
         }
     }
