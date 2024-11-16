@@ -93,6 +93,43 @@ impl DoorSwitch {
     #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
     pub fn new(_configuration: Configuration) -> Self {
         Self::check_state_file();
+
+        std::thread::spawn(move || {
+            let (tx, rx) = std::sync::mpsc::channel();
+
+            let mut debouncer = notify_debouncer_full::new_debouncer(
+                std::time::Duration::from_millis(10),
+                None,
+                tx,
+            )
+            .unwrap();
+
+            debouncer
+                .watch(
+                    super::DOORSWITCH_STATE_FILE,
+                    notify::RecursiveMode::Recursive,
+                )
+                .unwrap();
+
+            // print all events and errors
+            for result in rx {
+                match result {
+                    Ok(events) => events
+                        .iter()
+                        .filter(|event| {
+                            event.kind
+                                == notify::EventKind::Modify(notify::event::ModifyKind::Data(
+                                    notify::event::DataChange::Any,
+                                ))
+                        })
+                        .for_each(|event| {
+                            tracing::info!("{event:?}");
+                        }),
+                    Err(errors) => errors.iter().for_each(|error| tracing::error!("{error:?}")),
+                }
+            }
+        });
+
         Self {}
     }
 
@@ -125,9 +162,11 @@ impl StateTrait for DoorSwitch {
 
     #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
     fn state(&self) -> State {
-        let mut file = fs::File::open(super::DOORSWITCH_STATE_FILE).unwrap();
-        let mut contents = String::new();
-        file.read_to_string(&mut contents).unwrap();
-        contents.trim().parse::<bool>().unwrap().into()
+        fs::read_to_string(super::LOCKSWITCH_STATE_FILE)
+            .unwrap()
+            .trim()
+            .parse::<bool>()
+            .unwrap()
+            .into()
     }
 }

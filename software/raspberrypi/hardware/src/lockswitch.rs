@@ -100,109 +100,50 @@ impl LockSwitch {
 
     #[must_use]
     #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
-    pub fn new(_configuration: Configuration, _sender: tokio::sync::mpsc::Sender<bool>) -> Self {
+    pub fn new(_configuration: Configuration, sender: tokio::sync::mpsc::Sender<bool>) -> Self {
         Self::check_state_file();
 
-        use notify::{Error, RecommendedWatcher, RecursiveMode, Watcher};
-        use notify_debouncer_full::{
-            new_debouncer, DebounceEventResult, DebouncedEvent, Debouncer, FileIdMap,
-        };
-        use std::{path::Path, time::Duration};
-        use tokio::{runtime::Handle, sync::mpsc::Receiver};
+        std::thread::spawn(move || {
+            let (tx, rx) = std::sync::mpsc::channel();
 
-        pub struct NotifyHandler {
-            pub notify_watcher: Option<Debouncer<RecommendedWatcher, FileIdMap>>,
-            pub receiver: Option<Receiver<Result<Vec<DebouncedEvent>, Vec<Error>>>>,
-        }
+            let mut debouncer = notify_debouncer_full::new_debouncer(
+                std::time::Duration::from_millis(10),
+                None,
+                tx,
+            )
+            .unwrap();
 
-        impl NotifyHandler {
-            pub async fn initialize_notify_scheduler(&mut self) {
-                let (tx, rx) = tokio::sync::mpsc::channel(1);
-                let rt = Handle::current();
+            debouncer
+                .watch(
+                    super::LOCKSWITCH_STATE_FILE,
+                    notify::RecursiveMode::Recursive,
+                )
+                .unwrap();
 
-                let debouncer = new_debouncer(
-                    Duration::from_secs(3),
-                    None,
-                    move |result: DebounceEventResult| {
-                        let tx = tx.clone();
-
-                        println!("calling by notify -> {:?}", &result);
-                        rt.spawn(async move {
-                            if let Err(e) = tx.send(result).await {
-                                println!("Error sending event result: {:?}", e);
-                            }
-                        });
-                    },
-                );
-
-                match debouncer {
-                    Ok(watcher) => {
-                        println!("Initialize notify watcher success");
-                        self.notify_watcher = Some(watcher);
-
-                        self.receiver = Some(rx);
-                    }
-                    Err(error) => {
-                        println!("{:?}", error);
-                    }
+            // print all events and errors
+            for result in rx {
+                match result {
+                    Ok(events) => events
+                        .iter()
+                        .filter(|event| {
+                            event.kind
+                                == notify::EventKind::Modify(notify::event::ModifyKind::Data(
+                                    notify::event::DataChange::Any,
+                                ))
+                        })
+                        .for_each(|event| {
+                            tracing::info!("{event:?}");
+                            let state = fs::read_to_string(super::LOCKSWITCH_STATE_FILE)
+                                .unwrap()
+                                .trim()
+                                .parse::<bool>()
+                                .unwrap();
+                            sender.blocking_send(state).unwrap();
+                        }),
+                    Err(errors) => errors.iter().for_each(|error| tracing::error!("{error:?}")),
                 }
-            }
-
-            pub async fn watch(&mut self, path: &str) -> notify::Result<()> {
-                let watch_path = Path::new(path);
-
-                if watch_path.exists() {
-                    let is_file = watch_path.is_file();
-                    println!("Valid path {} is file {}", path, is_file);
-                } else {
-                    println!("watch path {:?} not exists", watch_path);
-                }
-
-                if let Some(watcher) = self.notify_watcher.as_mut() {
-                    watcher
-                        .watcher()
-                        .watch(watch_path, RecursiveMode::Recursive)?;
-
-                    watcher
-                        .cache()
-                        .add_root(watch_path, RecursiveMode::Recursive);
-
-                    if let Some(mut rx) = self.receiver.take() {
-                        tokio::spawn(async move {
-                            while let Some(res) = rx.recv().await {
-                                match res {
-                                    Ok(events) => {
-                                        println!("events: {:?}", events);
-                                    }
-                                    Err(errors) => {
-                                        println!("errors: {:?}", errors)
-                                    }
-                                }
-                            }
-                        });
-                    }
-                }
-
-                Ok(())
-            }
-        }
-
-        tokio::spawn(async move {
-            let mut notifier: NotifyHandler = NotifyHandler {
-                notify_watcher: None,
-                receiver: None,
-            };
-
-            notifier.initialize_notify_scheduler().await;
-            notifier.watch(super::LOCKSWITCH_STATE_FILE).await.unwrap();
-
-            loop {
-                tokio::time::sleep(Duration::from_secs(1)).await;
-                // let time: DateTime<Local> = Local::now();
-                // println!("{}: Hello, world!", time.format("%Y-%m-%d %H:%M:%S"));
             }
         });
-        println!("aha");
 
         Self {}
     }
@@ -237,9 +178,11 @@ impl StateTrait for LockSwitch {
 
     #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
     fn state(&self) -> State {
-        let mut file = fs::File::open(super::LOCKSWITCH_STATE_FILE).unwrap();
-        let mut contents = String::new();
-        file.read_to_string(&mut contents).unwrap();
-        contents.trim().parse::<bool>().unwrap().into()
+        fs::read_to_string(super::LOCKSWITCH_STATE_FILE)
+            .unwrap()
+            .trim()
+            .parse::<bool>()
+            .unwrap()
+            .into()
     }
 }
