@@ -10,7 +10,7 @@ use poem::{
 use tokio::sync::mpsc::{channel, Sender};
 
 use self::{
-    configuration::Configuration,
+    configuration::ConfigurationRef,
     handlers::{close, open, state},
     logic::logic,
 };
@@ -31,7 +31,7 @@ pub fn setup_routes(sender: Sender<hardware::Direction>) -> Result<Route> {
     Ok(routes)
 }
 
-pub async fn run(configuration: &Configuration) -> anyhow::Result<()> {
+pub async fn run(configuration: ConfigurationRef) -> anyhow::Result<()> {
     // Create channel
     let (spaceapi_sender, spaceapi_receiver) = channel(1);
     let (sender, receiver) = channel(1);
@@ -42,11 +42,9 @@ pub async fn run(configuration: &Configuration) -> anyhow::Result<()> {
         configuration.server.port,
     ));
 
-    let spaceapi_configuration = configuration.spaceapi.clone();
-    tokio::spawn(async move { notifyer::notify(&spaceapi_configuration, spaceapi_receiver).await });
+    tokio::spawn(async move { notifyer::notify(configuration, spaceapi_receiver).await });
 
-    let configuration = configuration.clone();
-    tokio::spawn(async move { logic(&configuration.clone(), receiver, spaceapi_sender).await });
+    tokio::spawn(async move { logic(configuration, receiver, spaceapi_sender).await });
 
     // Serve the application
     let server = Server::new(listener);

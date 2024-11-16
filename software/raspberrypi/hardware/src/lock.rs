@@ -52,12 +52,12 @@ pub trait StateTrait {
 #[derive(Debug, Clone, Copy)]
 pub struct Lock {
     state: State,
-    configuration: Configuration,
+    configuration: &'static Configuration,
 }
 
 impl Lock {
     #[must_use]
-    pub fn new(configuration: Configuration) -> Self {
+    pub fn new(configuration: &'static Configuration) -> Self {
         Self {
             state: State::Locked,
             configuration,

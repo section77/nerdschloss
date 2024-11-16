@@ -67,7 +67,7 @@ pub fn run(configuration: Configuration, direction: Direction) {
 }
 
 #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
-pub fn run(configuration: Configuration, direction: Direction) {
+pub fn run(configuration: &'static Configuration, direction: Direction) {
     dbg!(configuration);
     println!("Debug {direction:?}");
 

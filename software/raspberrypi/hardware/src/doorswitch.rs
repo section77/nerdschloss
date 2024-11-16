@@ -70,7 +70,7 @@ impl DoorSwitch {
         target_env = "musl",
         target_os = "linux"
     ))]
-    pub fn new(configuration: Configuration) -> Self {
+    pub fn new(configuration: &'static Configuration) -> Self {
         let mut gpio = Gpio::new()
             .unwrap()
             .get(configuration.pin)
@@ -91,7 +91,7 @@ impl DoorSwitch {
 
     #[must_use]
     #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
-    pub fn new(_configuration: Configuration) -> Self {
+    pub fn new(_configuration: &'static Configuration) -> Self {
         Self::check_state_file();
 
         std::thread::spawn(move || {

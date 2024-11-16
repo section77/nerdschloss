@@ -3,16 +3,16 @@ use tracing::info;
 
 use hardware::{doorswitch, lock, lockswitch, lockswitch::StateTrait, Direction};
 
-use crate::configuration::Configuration;
+use crate::configuration::ConfigurationRef;
 
 pub async fn logic(
-    configuration: &Configuration,
+    configuration: ConfigurationRef,
     mut receiver: Receiver<Direction>,
     spaceapi_sender: Sender<bool>,
 ) {
-    let lockswitch = lockswitch::LockSwitch::new(configuration.lockswitch, spaceapi_sender);
-    let _doorswitch = doorswitch::DoorSwitch::new(configuration.doorswitch);
-    let mut lock = lock::Lock::new(configuration.lockmotor);
+    let lockswitch = lockswitch::LockSwitch::new(&configuration.lockswitch, spaceapi_sender);
+    let _doorswitch = doorswitch::DoorSwitch::new(&configuration.doorswitch);
+    let mut lock = lock::Lock::new(&configuration.lockmotor);
     let mut is_open;
 
     while let Some(msg) = receiver.recv().await {

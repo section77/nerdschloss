@@ -1,3 +1,5 @@
+use std::boxed::Box;
+
 use anyhow::{Error, Result};
 use clap::Parser;
 use shadow_rs::shadow;
@@ -26,12 +28,12 @@ struct Args {
     spaceapi: bool,
 }
 
-fn load_configuration() -> Result<(configuration::Configuration, Args), Error> {
+fn load_configuration() -> Result<(configuration::ConfigurationRef, Args), Error> {
     // Load .env file
     dotenvy::dotenv().ok();
 
     // Read configuration from files and environment
-    let configuration = configuration::Configuration::new()?;
+    let configuration = Box::leak(Box::new(configuration::Configuration::new()?));
 
     // Read commandline arguments
     let args = Args::parse();
@@ -61,7 +63,7 @@ async fn main() -> Result<(), Error> {
         return Ok(());
     }
 
-    run(&configuration).await?;
+    run(configuration).await?;
 
     Ok(())
 }
