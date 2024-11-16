@@ -6,6 +6,8 @@ use serde::Deserialize;
 
 use hardware::{doorswitch, lock, lockswitch};
 
+pub type ConfigurationRef = &'static Configuration;
+
 #[derive(Debug, Clone, Copy, Deserialize)]
 pub struct Server {
     pub ipaddress: std::net::IpAddr,

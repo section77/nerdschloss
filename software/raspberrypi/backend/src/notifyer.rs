@@ -4,7 +4,7 @@ use secrecy::ExposeSecret;
 use tokio::sync::mpsc::Receiver;
 use tracing::{error, info};
 
-use crate::configuration::SpaceAPI;
+use crate::configuration::{ConfigurationRef, SpaceAPI};
 
 // async fn mqtt(state: bool) {
 //     info!("MQTT");
@@ -42,7 +42,7 @@ use crate::configuration::SpaceAPI;
 //     // }
 // }
 
-async fn spaceapi(configuration: &SpaceAPI, state: bool) {
+async fn spaceapi(configuration: &'static SpaceAPI, state: bool) {
     info!("SpaceAPI {state:?}");
 
     if configuration.enable {
@@ -78,10 +78,10 @@ async fn spaceapi(configuration: &SpaceAPI, state: bool) {
     }
 }
 
-pub async fn notify(configuration: &SpaceAPI, mut receiver: Receiver<bool>) {
+pub async fn notify(configuration: ConfigurationRef, mut receiver: Receiver<bool>) {
     while let Some(state) = receiver.recv().await {
         // let mqtt = mqtt(state);
-        let _spaceapi = spaceapi(configuration, state).await;
+        let _spaceapi = spaceapi(&configuration.spaceapi, state).await;
         // tokio::join!(mqtt, spaceapi);
     }
 }
