@@ -18,7 +18,7 @@ pretty_assertions = "1"
 [dependencies]
 hardware = { path = "../hardware" }
 clap = { version = "4", features = ["derive", "cargo", "env", "unicode"] }
-clap-verbosity-flag = "2"
+clap-verbosity-flag = "3"
 dotenvy = "0.15"
 shadow-rs = "0.36"
 config = { version = "0.14", default-features = false, features = ["toml"] }
