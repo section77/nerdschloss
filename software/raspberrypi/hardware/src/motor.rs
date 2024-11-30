@@ -22,7 +22,7 @@ pub enum Direction {
     target_env = "musl",
     target_os = "linux"
 ))]
-pub fn run(configuration: Configuration, direction: Direction) {
+pub fn run(configuration: &'static Configuration, direction: Direction) {
     println!("Hardware {direction:?}");
 
     // set motor direction
