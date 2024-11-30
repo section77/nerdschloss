@@ -1,3 +1,7 @@
+[env]
+#PYO3_PYTHON = "./ve/bin/python"
+PYTHONPATH = "./ve/lib/python3.12/site-packages"
+
 [build]
 #target = "arm-unknown-linux-musleabihf"
 #target = "armv7-unknown-linux-musleabihf"
