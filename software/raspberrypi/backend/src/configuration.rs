@@ -23,10 +23,22 @@ pub struct SpaceAPI {
 }
 
 #[derive(Debug, Clone, Deserialize)]
+pub struct MatterMost {
+    pub enable: bool,
+    pub url: String,
+    pub loginid: String,
+    pub apitoken: String,
+    pub scheme: String,
+    pub port: u16,
+}
+
+#[derive(Debug, Clone, Deserialize)]
 pub struct Configuration {
     pub server: Server,
 
     pub spaceapi: SpaceAPI,
+
+    pub mattermost: MatterMost,
 
     // hardware
     pub lockmotor: lock::Configuration,
