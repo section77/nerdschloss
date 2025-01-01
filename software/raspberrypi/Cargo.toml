@@ -1,9 +1,6 @@
 [workspace]
 resolver = "2"
-members = [
-	"backend",
-	"hardware",
-]
+members = ["backend", "hardware"]
 
 [profile.release]
 lto = true
