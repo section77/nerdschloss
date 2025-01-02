@@ -5,24 +5,13 @@ use serde::Deserialize;
 
 use hardware::{doorswitch, lock, lockswitch};
 
-use crate::spaceapi::configuration::SpaceAPI;
+use crate::{mattermost::configuration::MatterMost, spaceapi::configuration::SpaceAPI};
 
 pub type ConfigurationRef = &'static Configuration;
 
 #[derive(Debug, Clone, Copy, Deserialize)]
 pub struct Server {
     pub ipaddress: std::net::IpAddr,
-    pub port: u16,
-}
-
-
-#[derive(Debug, Clone, Deserialize)]
-pub struct MatterMost {
-    pub enable: bool,
-    pub url: String,
-    pub loginid: String,
-    pub apitoken: String,
-    pub scheme: String,
     pub port: u16,
 }
 

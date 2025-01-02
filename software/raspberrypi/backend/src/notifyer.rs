@@ -1,6 +1,6 @@
 use tokio::sync::mpsc::Receiver;
 
-use crate::{configuration::ConfigurationRef, spaceapi::spaceapi};
+use crate::{configuration::ConfigurationRef, mattermost::mattermost, spaceapi::spaceapi};
 
 // async fn mqtt(state: bool) {
 //     info!("MQTT");
@@ -37,35 +37,6 @@ use crate::{configuration::ConfigurationRef, spaceapi::spaceapi};
 //     //     println!("Received = {:?}", notification);
 //     // }
 // }
-
-
-fn mattermost(configuration: &'static MatterMost, state: bool) {
-    use pyo3::{ffi::c_str, prelude::*, types::PyTuple};
-
-    let code = c_str!(std::include_str!("../../backend/python/mattermost.py"));
-    Python::with_gil(|py| {
-        let fun = PyModule::from_code(py, code, c_str!("mattermost.py"), c_str!("mattermost"))
-            .unwrap()
-            .getattr("main")
-            .unwrap();
-
-        // pass object with Rust tuple of positional arguments
-        let args = PyTuple::new(
-            py,
-            [
-                configuration.url.as_str(),
-                configuration.loginid.as_str(),
-                configuration.apitoken.as_str(),
-                configuration.scheme.as_str(),
-                &configuration.port.to_string(),
-                &state.to_string(),
-            ],
-        )
-        .unwrap();
-
-        let _ = fun.call1(args).unwrap();
-    })
-}
 
 pub async fn notify(configuration: ConfigurationRef, mut receiver: Receiver<bool>) {
     while let Some(state) = receiver.recv().await {
