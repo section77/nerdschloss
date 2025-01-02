@@ -2,6 +2,7 @@ pub mod configuration;
 mod handlers;
 mod logic;
 mod notifyer;
+mod spaceapi;
 
 use anyhow::Result;
 use poem::{

@@ -1,10 +1,11 @@
 use anyhow::Result;
 use config::{Config, ConfigError, Environment, File};
 use directories_next::ProjectDirs;
-use secrecy::SecretString;
 use serde::Deserialize;
 
 use hardware::{doorswitch, lock, lockswitch};
+
+use crate::spaceapi::configuration::SpaceAPI;
 
 pub type ConfigurationRef = &'static Configuration;
 
@@ -14,13 +15,6 @@ pub struct Server {
     pub port: u16,
 }
 
-#[derive(Debug, Clone, Deserialize)]
-pub struct SpaceAPI {
-    pub enable: bool,
-    pub url: String,
-    pub username: String,
-    pub password: SecretString,
-}
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct MatterMost {
