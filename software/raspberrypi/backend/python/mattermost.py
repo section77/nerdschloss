@@ -1,15 +1,19 @@
 #!/usr/bin/env python
 
+import sys
+
 from mattermostdriver import Driver
 
 
 def main(*args):
-    url = args[0]
-    login_id = args[1]
-    api_token = args[2]
-    scheme = args[3]
-    port = args[4]
-    state = args[5]
+    print(args)
+
+    url = args[0][0]
+    login_id = args[0][1]
+    api_token = args[0][2]
+    scheme = args[0][3]
+    port = args[0][4]
+    state = args[0][5]
 
     driver = Driver(
         {
@@ -42,3 +46,7 @@ def main(*args):
     )
 
     driver.logout()
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
