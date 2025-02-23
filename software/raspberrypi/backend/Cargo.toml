@@ -10,12 +10,12 @@ name = "nerdschloss"
 path = "src/main.rs"
 
 [build-dependencies]
-shadow-rs = "0.38"
+shadow-rs = "1"
 
 [dev-dependencies]
 pretty_assertions = "1"
 tokio = { version = "1", features = ["rt", "macros"] }
-fake = "3"
+fake = "4"
 secrecy = "0.10"
 wiremock = "0.6"
 
@@ -24,7 +24,7 @@ hardware = { path = "../hardware" }
 clap = { version = "4", features = ["derive", "cargo", "env", "unicode"] }
 clap-verbosity-flag = "3"
 dotenvy = "0.15"
-shadow-rs = "0.38"
+shadow-rs = "1"
 config = { version = "0.15", default-features = false, features = ["toml"] }
 tracing = "0.1"
 tracing-log = "0.2.0"
