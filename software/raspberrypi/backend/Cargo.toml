@@ -15,7 +15,7 @@ shadow-rs = "0.38"
 [dev-dependencies]
 pretty_assertions = "1"
 tokio = { version = "1", features = ["rt", "macros"] }
-fake = "3"
+fake = "4"
 secrecy = "0.10"
 wiremock = "0.6"
 
