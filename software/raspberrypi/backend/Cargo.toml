@@ -10,17 +10,21 @@ name = "nerdschloss"
 path = "src/main.rs"
 
 [build-dependencies]
-shadow-rs = "0.38"
+shadow-rs = "1"
 
 [dev-dependencies]
 pretty_assertions = "1"
+tokio = { version = "1", features = ["rt", "macros"] }
+fake = "4"
+secrecy = "0.10"
+wiremock = "0.6"
 
 [dependencies]
 hardware = { path = "../hardware" }
 clap = { version = "4", features = ["derive", "cargo", "env", "unicode"] }
 clap-verbosity-flag = "3"
 dotenvy = "0.15"
-shadow-rs = "0.38"
+shadow-rs = "1"
 config = { version = "0.15", default-features = false, features = ["toml"] }
 tracing = "0.1"
 tracing-log = "0.2.0"
@@ -29,6 +33,7 @@ tracing-oslog = "0.2"
 tracing-journald = "0.3"
 directories-next = "2"
 serde = { version = "1", features = ["derive"] }
+serde_json = "1"
 anyhow = "1"
 thiserror = "2"
 rust-embed = "8"
@@ -42,7 +47,9 @@ poem = { version = "3", features = [
 ] }
 reqwest = { version = "0.12", default-features = false, features = [
     "rustls-tls",
+    "json",
 ] }
 reqwest-retry = "0.7"
-reqwest-middleware = "0.4"
+reqwest-middleware = { version = "0.4", features = ["json"] }
+reqwest-tracing = "0.5"
 secrecy = { version = "0.10", features = ["serde"] }
