@@ -53,4 +53,3 @@ reqwest-retry = "0.7"
 reqwest-middleware = { version = "0.4", features = ["json"] }
 reqwest-tracing = "0.5"
 secrecy = { version = "0.10", features = ["serde"] }
-pyo3 = { version = "0.25", features = ["anyhow", "auto-initialize", "serde"] }
