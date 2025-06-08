@@ -14,6 +14,10 @@ shadow-rs = "1"
 
 [dev-dependencies]
 pretty_assertions = "1"
+tokio = { version = "1", features = ["rt", "macros"] }
+fake = "4"
+secrecy = "0.10"
+wiremock = "0.6"
 
 [dependencies]
 hardware = { path = "../hardware" }
@@ -29,6 +33,7 @@ tracing-oslog = "0.3"
 tracing-journald = "0.3"
 directories-next = "2"
 serde = { version = "1", features = ["derive"] }
+serde_json = "1"
 anyhow = "1"
 thiserror = "2"
 rust-embed = "8"
@@ -42,9 +47,10 @@ poem = { version = "3", features = [
 ] }
 reqwest = { version = "0.12", default-features = false, features = [
     "rustls-tls",
+    "json",
 ] }
 reqwest-retry = "0.7"
-reqwest-middleware = "0.4"
+reqwest-middleware = { version = "0.4", features = ["json"] }
+reqwest-tracing = "0.5"
 secrecy = { version = "0.10", features = ["serde"] }
-
 pyo3 = { version = "0.25", features = ["anyhow", "auto-initialize", "serde"] }
