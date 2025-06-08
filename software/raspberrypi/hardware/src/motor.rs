@@ -1,4 +1,7 @@
-#[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
+#[cfg(all(
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "macos", target_os = "linux")
+))]
 use std::{fs, io::prelude::*};
 
 #[cfg(all(
@@ -66,7 +69,10 @@ pub fn run(configuration: &'static Configuration, direction: Direction) {
     println!("Stop motor");
 }
 
-#[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
+#[cfg(all(
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "macos", target_os = "linux")
+))]
 pub fn run(configuration: &'static Configuration, direction: Direction) {
     dbg!(configuration);
     println!("Debug {direction:?}");

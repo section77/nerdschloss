@@ -1,4 +1,7 @@
-#[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
+#[cfg(all(
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "macos", target_os = "linux")
+))]
 use std::{fs, io::prelude::*, path};
 
 use serde::{Deserialize, Serialize};
@@ -90,7 +93,10 @@ impl DoorSwitch {
     }
 
     #[must_use]
-    #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "aarch64"),
+        any(target_os = "macos", target_os = "linux")
+    ))]
     pub fn new(_configuration: &'static Configuration) -> Self {
         Self::check_state_file();
 
@@ -133,7 +139,10 @@ impl DoorSwitch {
         Self {}
     }
 
-    #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "aarch64"),
+        any(target_os = "macos", target_os = "linux")
+    ))]
     fn check_state_file() {
         let state_file = path::Path::new(super::DOORSWITCH_STATE_FILE);
         if !state_file.parent().unwrap().exists() {
@@ -160,7 +169,10 @@ impl StateTrait for DoorSwitch {
         }
     }
 
-    #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "aarch64"),
+        any(target_os = "macos", target_os = "linux")
+    ))]
     fn state(&self) -> State {
         fs::read_to_string(super::LOCKSWITCH_STATE_FILE)
             .unwrap()

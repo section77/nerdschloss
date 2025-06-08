@@ -1,4 +1,7 @@
-#[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
+#[cfg(all(
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "macos", target_os = "linux")
+))]
 use std::{fs, io::prelude::*, path};
 
 use serde::{Deserialize, Serialize};
@@ -102,7 +105,10 @@ impl LockSwitch {
     }
 
     #[must_use]
-    #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "aarch64"),
+        any(target_os = "macos", target_os = "linux")
+    ))]
     pub fn new(
         _configuration: &'static Configuration,
         sender: tokio::sync::mpsc::Sender<bool>,
@@ -154,7 +160,10 @@ impl LockSwitch {
         Self {}
     }
 
-    #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "aarch64"),
+        any(target_os = "macos", target_os = "linux")
+    ))]
     fn check_state_file() {
         let state_file = path::Path::new(super::LOCKSWITCH_STATE_FILE);
         if !state_file.parent().unwrap().exists() {
@@ -182,7 +191,10 @@ impl StateTrait for LockSwitch {
         }
     }
 
-    #[cfg(all(target_arch = "x86_64", any(target_os = "macos", target_os = "linux")))]
+    #[cfg(all(
+        any(target_arch = "x86_64", target_arch = "aarch64"),
+        any(target_os = "macos", target_os = "linux")
+    ))]
     fn state(&self) -> State {
         fs::read_to_string(super::LOCKSWITCH_STATE_FILE)
             .unwrap()
