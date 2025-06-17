@@ -1,6 +1,7 @@
 #[cfg(all(
     any(target_arch = "x86_64", target_arch = "aarch64"),
-    any(target_os = "macos", target_os = "linux")
+    any(target_os = "macos", target_os = "linux"),
+    not(target_env = "musl")
 ))]
 use std::{fs, io::prelude::*, path};
 
@@ -107,7 +108,8 @@ impl LockSwitch {
     #[must_use]
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "aarch64"),
-        any(target_os = "macos", target_os = "linux")
+        any(target_os = "macos", target_os = "linux"),
+        not(target_env = "musl")
     ))]
     pub fn new(
         _configuration: &'static Configuration,
@@ -162,7 +164,8 @@ impl LockSwitch {
 
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "aarch64"),
-        any(target_os = "macos", target_os = "linux")
+        any(target_os = "macos", target_os = "linux"),
+        not(target_env = "musl")
     ))]
     fn check_state_file() {
         let state_file = path::Path::new(super::LOCKSWITCH_STATE_FILE);
@@ -193,7 +196,8 @@ impl StateTrait for LockSwitch {
 
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "aarch64"),
-        any(target_os = "macos", target_os = "linux")
+        any(target_os = "macos", target_os = "linux"),
+        not(target_env = "musl")
     ))]
     fn state(&self) -> State {
         fs::read_to_string(super::LOCKSWITCH_STATE_FILE)

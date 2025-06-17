@@ -1,6 +1,7 @@
 #[cfg(all(
     any(target_arch = "x86_64", target_arch = "aarch64"),
-    any(target_os = "macos", target_os = "linux")
+    any(target_os = "macos", target_os = "linux"),
+    not(target_env = "musl")
 ))]
 use std::{fs, io::prelude::*, path};
 
@@ -95,7 +96,8 @@ impl DoorSwitch {
     #[must_use]
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "aarch64"),
-        any(target_os = "macos", target_os = "linux")
+        any(target_os = "macos", target_os = "linux"),
+        not(target_env = "musl")
     ))]
     pub fn new(_configuration: &'static Configuration) -> Self {
         Self::check_state_file();
@@ -141,7 +143,8 @@ impl DoorSwitch {
 
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "aarch64"),
-        any(target_os = "macos", target_os = "linux")
+        any(target_os = "macos", target_os = "linux"),
+        not(target_env = "musl")
     ))]
     fn check_state_file() {
         let state_file = path::Path::new(super::DOORSWITCH_STATE_FILE);
@@ -171,7 +174,8 @@ impl StateTrait for DoorSwitch {
 
     #[cfg(all(
         any(target_arch = "x86_64", target_arch = "aarch64"),
-        any(target_os = "macos", target_os = "linux")
+        any(target_os = "macos", target_os = "linux"),
+        not(target_env = "musl")
     ))]
     fn state(&self) -> State {
         fs::read_to_string(super::LOCKSWITCH_STATE_FILE)

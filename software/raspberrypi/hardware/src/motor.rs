@@ -1,6 +1,6 @@
 #[cfg(all(
     any(target_arch = "x86_64", target_arch = "aarch64"),
-    any(target_os = "macos", target_os = "linux")
+    any(target_os = "macos", target_os = "linux"),
 ))]
 use std::{fs, io::prelude::*};
 
@@ -71,7 +71,8 @@ pub fn run(configuration: &'static Configuration, direction: Direction) {
 
 #[cfg(all(
     any(target_arch = "x86_64", target_arch = "aarch64"),
-    any(target_os = "macos", target_os = "linux")
+    any(target_os = "macos", target_os = "linux"),
+    not(target_env = "musl")
 ))]
 pub fn run(configuration: &'static Configuration, direction: Direction) {
     dbg!(configuration);
