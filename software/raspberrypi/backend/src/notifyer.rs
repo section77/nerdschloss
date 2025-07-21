@@ -42,7 +42,7 @@ pub async fn notify(configuration: ConfigurationRef, mut receiver: Receiver<bool
     while let Some(state) = receiver.recv().await {
         // let mqtt = mqtt(state);
         let _spaceapi = spaceapi(&configuration.spaceapi, state).await;
-        mattermost(&configuration.mattermost, state);
+        mattermost(&configuration.mattermost, state).await;
         // tokio::join!(mqtt, spaceapi);
     }
 }

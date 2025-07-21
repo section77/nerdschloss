@@ -1,42 +1,151 @@
 pub mod configuration;
 
-mod client;
-mod types;
-
-use std::process::Command;
+use mattermost_rust_client::{apis, models};
+use tracing::{error, info};
 
 use configuration::MatterMost;
 
-pub fn mattermost(configuration: &MatterMost, state: bool) {
-    if configuration.enable {
-        let code = std::include_str!("../../../backend/python/mattermost.py");
-        let output = Command::new(&configuration.python)
-            .args([
-                "-c",
-                code,
-                configuration.url.as_str(),
-                configuration.loginid.as_str(),
-                configuration.apitoken.as_str(),
-                configuration.scheme.as_str(),
-                &configuration.port.to_string(),
-                &state.to_string(),
-            ])
-            .output()
-            .expect("Error: Failed to set MatterMost message");
+pub async fn mattermost(configuration: &MatterMost, state: bool) {
+    if !configuration.enable {
+        return;
+    }
 
-        println!("output start");
-        use std::io::{self, Write};
-        io::stdout().write_all(&output.stdout).unwrap();
-        io::stderr().write_all(&output.stderr).unwrap();
-        println!("output end");
+    let url = configuration.url.clone();
+    let _login_id = configuration.loginid.clone();
+    let api_token = configuration.apitoken.clone();
+    let scheme = configuration.scheme.clone();
+    let port: u16 = configuration.port;
+
+    // Create configuration
+    let mut config = apis::configuration::Configuration::new();
+    config.base_path = format!("{scheme}://{url}:{port}/api/v4");
+    let api_key = apis::configuration::ApiKey {
+        prefix: None,
+        key: api_token,
+    };
+    config.api_key = Some(api_key);
+
+    let _user = match apis::users_api::get_user(&config, "me").await {
+        Ok(user) => user,
+        Err(e) => {
+            error!("Error: {e}");
+            return;
+        }
+    };
+
+    // Get team by name "section77"
+    let team = match apis::teams_api::get_team_by_name(&config, "section77").await {
+        Ok(team) => team,
+        Err(e) => {
+            error!("Error: {e}");
+            return;
+        }
+    };
+    let team_id = match team.id.as_ref().ok_or("Team ID is missing") {
+        Ok(team_id) => team_id,
+        Err(e) => {
+            error!("Error: {e}");
+            return;
+        }
+    };
+
+    // Get channel by name "clubstatus"
+    let channel =
+        match apis::channels_api::get_channel_by_name(&config, team_id, "clubstatus", None).await {
+            Ok(channel) => channel,
+            Err(e) => {
+                error!("Error: {e}");
+                return;
+            }
+        };
+    let channel_id = match channel.id.as_ref().ok_or("Channel ID is missing") {
+        Ok(channel_id) => channel_id,
+        Err(e) => {
+            error!("Error: {e}");
+            return;
+        }
+    };
+
+    // Determine message and display name based on state
+    let (message, display_name) = match &state {
+        true => ("Die Section77 ist offen", "Status: Offen"),
+        false => ("Die Section77 ist geschlossen", "Status: Geschlossen"),
+    };
+
+    // Create post
+    let post_request = models::CreatePostRequest::new(channel_id.clone(), message.to_string());
+
+    match apis::posts_api::create_post(&config, post_request, None).await {
+        Ok(_) => {
+            info!("Post created");
+        }
+        Err(e) => {
+            error!("Error: {e}");
+            return;
+        }
+    }
+
+    // Update channel display name
+    let patch_channel = models::PatchChannelRequest {
+        display_name: Some(display_name.to_string()),
+        ..Default::default()
+    };
+
+    match apis::channels_api::patch_channel(&config, channel_id, patch_channel).await {
+        Ok(_) => {
+            info!("Channel updated");
+        }
+        Err(e) => {
+            error!("Error: {e}");
+        }
+    }
+
+    match apis::users_api::logout(&config).await {
+        Ok(_) => {
+            info!("Logout successful");
+        }
+        Err(e) => {
+            error!("Error: {e}");
+        }
     }
 }
 
+// pub fn mattermost(configuration: &MatterMost, state: bool) {
+//     use std::process::Command;
+//     if configuration.enable {
+//         let code = std::include_str!("../../../backend/python/mattermost.py");
+//         #[allow(unused_variables)]
+//         let output = Command::new(&configuration.python)
+//             .args([
+//                 "-c",
+//                 code,
+//                 configuration.url.as_str(),
+//                 configuration.loginid.as_str(),
+//                 configuration.apitoken.as_str(),
+//                 configuration.scheme.as_str(),
+//                 &configuration.port.to_string(),
+//                 &state.to_string(),
+//             ])
+//             .output()
+//             .expect("Error: Failed to set MatterMost message");
+
+//         #[cfg(test)]
+//         {
+//             println!("output start");
+//             println!("Script stdout: {}", String::from_utf8_lossy(&output.stdout));
+//             println!("Script stderr: {}", String::from_utf8_lossy(&output.stderr));
+//             println!("Script exit code: {}", output.status);
+//             println!("output end");
+//         }
+//     }
+// }
+
 #[cfg(test)]
 mod tests {
+    use serde_json::json;
     use wiremock::{
         http::Method,
-        matchers::{body_json, header, method, path},
+        matchers::{body_json, method, path},
         {Mock, MockServer, ResponseTemplate},
     };
 
@@ -58,150 +167,85 @@ mod tests {
             enable: false,
             ..Default::default()
         };
-        mattermost(&mm_config, true);
+        mattermost(&mm_config, true).await;
     }
 
     #[tokio::test]
-    async fn send_mattermost_message() {
+    async fn mattermost_state_open() {
         let mock_server = MockServer::start().await;
 
-        use super::types::users::{NotifyProps, Props, Timezone, UserResponse};
-        let user_response = UserResponse {
-            id: "user123".to_string(),
-            create_at: 1612345678,
-            update_at: 1612345678,
-            delete_at: 0,
-            username: "testuser".to_string(),
-            first_name: "Test".to_string(),
-            last_name: "User".to_string(),
-            nickname: "tester".to_string(),
-            email: "test@example.com".to_string(),
-            email_verified: true,
-            auth_service: "email".to_string(),
-            roles: "system_user".to_string(),
-            locale: "en".to_string(),
-            notify_props: NotifyProps {
-                email: "true".to_string(),
-                push: "mention".to_string(),
-                desktop: "all".to_string(),
-                desktop_sound: "true".to_string(),
-                mention_keys: "test,user".to_string(),
-                channel: "true".to_string(),
-                first_name: "false".to_string(),
-            },
-            props: Props::default(),
-            last_password_update: 1612345678,
-            last_picture_update: 1612345678,
-            failed_attempts: 0,
-            mfa_active: true,
-            timezone: Timezone {
-                use_automatic_timezone: true,
-                manual_timezone: "".to_string(),
-                automatic_timezone: "America/New_York".to_string(),
-            },
-            terms_of_service_id: "tos123".to_string(),
-            terms_of_service_create_at: 1612345678,
-        };
-
-        Mock::given(method("GET"))
+        // Mock GET /users/me to validate token
+        Mock::given(method(Method::GET))
             .and(path("/api/v4/users/me"))
-            .and(header("content-type", "application/json"))
-            .respond_with(ResponseTemplate::new(200).set_body_json(&user_response))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "id": "user-id",
+                "username": "clubstatus"
+            })))
             .expect(1)
             .mount(&mock_server)
             .await;
 
-        use super::types::teams::TeamResponse;
-        let team_response = TeamResponse {
-            id: "section77".to_string(),
-            create_at: 1612345678,
-            update_at: 1612345678,
-            delete_at: 0,
-            display_name: "section77".to_string(),
-            name: "section77".to_string(),
-            description: "This is a test team".to_string(),
-            email: "team@example.com".to_string(),
-            r#type: "O".to_string(), // 'O' for Open, 'I' for Invite only
-            allowed_domains: "example.com".to_string(),
-            invite_id: "invite123".to_string(),
-            allow_open_invite: true,
-            policy_id: "policy123".to_string(),
-        };
+        // Mock GET team by name
         Mock::given(method(Method::GET))
-            .and(path("api/v4/teams/name/section77"))
-            .respond_with(ResponseTemplate::new(200).set_body_json(&team_response))
+            .and(path("/api/v4/teams/name/section77"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "id": "team-id",
+                "name": "section77"
+            })))
             .expect(1)
             .mount(&mock_server)
             .await;
 
+        // Mock GET channel by name
         Mock::given(method(Method::GET))
-            .and(path("api/v4/teams/section77/channels/name/clubstatus"))
-            .respond_with(ResponseTemplate::new(200).set_body_json(&team_response))
+            .and(path("/api/v4/teams/team-id/channels/name/clubstatus"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "id": "channel-id",
+                "name": "clubstatus"
+            })))
             .expect(1)
             .mount(&mock_server)
             .await;
 
-        // Create a sample post response
-        let post_response = super::types::posts::PostResponse {
-            id: "post123".to_string(),
-            create_at: 1612345678,
-            update_at: 1612345678,
-            delete_at: 0,
-            edit_at: 0,
-            user_id: "user123".to_string(),
-            channel_id: "clubstatus".to_string(),
-            root_id: "".to_string(),
-            original_id: "".to_string(),
-            message: "Die Section77 ist offen".to_string(),
-            type_field: "".to_string(),
-            props: super::types::posts::Props::default(),
-            hashtag: "".to_string(),
-            file_ids: vec!["file123".to_string()],
-            pending_post_id: "".to_string(),
-            metadata: super::types::posts::Metadata::default(),
-        };
-
+        // Mock POST to create a post
         Mock::given(method(Method::POST))
-            .and(path("api/v4/posts"))
-            .respond_with(ResponseTemplate::new(201).set_body_json(&post_response))
+            .and(path("/api/v4/posts"))
+            .and(body_json(json!({
+                "channel_id": "channel-id",
+                "message": "Die Section77 ist offen"
+            })))
+            .respond_with(ResponseTemplate::new(201).set_body_json(json!({
+                "id": "post-id"
+            })))
+            .expect(1)
             .mount(&mock_server)
             .await;
 
-        // Expected request body
-        let expected_request = super::types::channels::ChannelPatchRequest {
-            name: "updated-channel".to_string(),
-            display_name: "Updated Channel".to_string(),
-            purpose: "This is an updated purpose".to_string(),
-            header: "Updated channel header".to_string(),
-        };
-
-        // Create a sample channel response
-        let channel_response = super::types::channels::ChannelResponse {
-            id: "clubstatus".to_string(),
-            create_at: 1612345678,
-            update_at: 1612345679, // Updated timestamp
-            delete_at: 0,
-            team_id: "section77".to_string(),
-            name: "clubstatus".to_string(),
-            display_name: "Status: Offen".to_string(),
-            purpose: "".to_string(),
-            header: "".to_string(),
-            type_field: "".to_string(),
-            creator_id: "user123".to_string(),
-            last_post_at: 1612345678,
-            total_msg_count: 42,
-            extra_update_at: 0,
-        };
-         Mock::given(method(Method::PUT))
-            .and(path(r"api/v4/channels/clubstatus/patch"))
-            .and(body_json(&expected_request))
-            .respond_with(ResponseTemplate::new(200).set_body_json(&channel_response))
+        // Mock PATCH to update channel display name
+        Mock::given(method(Method::PUT))
+            .and(path("/api/v4/channels/channel-id/patch"))
+            .and(body_json(json!({
+                "display_name": "Status: Offen"
+            })))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "id": "channel-id",
+                "display_name": "Status: Offen"
+            })))
+            .expect(1)
             .mount(&mock_server)
             .await;
 
-        // Call funtion to set channel status
+        // Mock logout
+        Mock::given(method(Method::POST))
+            .and(path("/api/v4/users/logout"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({})))
+            .expect(1)
+            .mount(&mock_server)
+            .await;
+
+        // Create MatterMost configuration
         let mm_config = MatterMost {
-            python: String::from("../ve/bin/python"),
+            python: String::from("../.venv/bin/python"),
             enable: true,
             url: mock_server.address().ip().to_string(),
             loginid: String::from("clubstatus"),
@@ -209,6 +253,215 @@ mod tests {
             scheme: String::from("http"),
             port: mock_server.address().port(),
         };
-        mattermost(&mm_config, true);
+
+        // Call the function with state = true (open)
+        mattermost(&mm_config, true).await;
+    }
+
+    #[tokio::test]
+    async fn mattermost_state_closed() {
+        let mock_server = MockServer::start().await;
+
+        // Mock GET /users/me to validate token
+        Mock::given(method(Method::GET))
+            .and(path("/api/v4/users/me"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "id": "user-id",
+                "username": "clubstatus"
+            })))
+            .expect(1)
+            .mount(&mock_server)
+            .await;
+
+        // Mock GET team by name
+        Mock::given(method(Method::GET))
+            .and(path("/api/v4/teams/name/section77"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "id": "team-id",
+                "name": "section77"
+            })))
+            .expect(1)
+            .mount(&mock_server)
+            .await;
+
+        // Mock GET channel by name
+        Mock::given(method(Method::GET))
+            .and(path("/api/v4/teams/team-id/channels/name/clubstatus"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "id": "channel-id",
+                "name": "clubstatus"
+            })))
+            .expect(1)
+            .mount(&mock_server)
+            .await;
+
+        // Mock POST to create a post for closed state
+        Mock::given(method(Method::POST))
+            .and(path("/api/v4/posts"))
+            .and(body_json(json!({
+                "channel_id": "channel-id",
+                "message": "Die Section77 ist geschlossen"
+            })))
+            .respond_with(ResponseTemplate::new(201).set_body_json(json!({
+                "id": "post-id"
+            })))
+            .expect(1)
+            .mount(&mock_server)
+            .await;
+
+        // Mock PATCH to update channel display name for closed state
+        Mock::given(method(Method::PUT))
+            .and(path("/api/v4/channels/channel-id/patch"))
+            .and(body_json(json!({
+                "display_name": "Status: Geschlossen"
+            })))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "id": "channel-id",
+                "display_name": "Status: Geschlossen"
+            })))
+            .expect(1)
+            .mount(&mock_server)
+            .await;
+
+        // Mock logout
+        Mock::given(method(Method::POST))
+            .and(path("/api/v4/users/logout"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({})))
+            .expect(1)
+            .mount(&mock_server)
+            .await;
+
+        // Create MatterMost configuration
+        let mm_config = MatterMost {
+            python: String::from("../.venv/bin/python"),
+            enable: true,
+            url: mock_server.address().ip().to_string(),
+            loginid: String::from("clubstatus"),
+            apitoken: String::from("apitoken"),
+            scheme: String::from("http"),
+            port: mock_server.address().port(),
+        };
+
+        // Call the function with state = false (closed)
+        mattermost(&mm_config, false).await;
+    }
+
+    #[tokio::test]
+    async fn mattermost_api_error_handling() {
+        let mock_server = MockServer::start().await;
+
+        // Mock GET /users/me to return 401 Unauthorized
+        Mock::given(method(Method::GET))
+            .and(path("/api/v4/users/me"))
+            .respond_with(ResponseTemplate::new(401).set_body_json(json!({
+                "message": "Invalid token"
+            })))
+            .expect(1)
+            .mount(&mock_server)
+            .await;
+
+        let mm_config = MatterMost {
+            python: String::from("../.venv/bin/python"),
+            enable: true,
+            url: mock_server.address().ip().to_string(),
+            loginid: String::from("clubstatus"),
+            apitoken: String::from("invalid-token"),
+            scheme: String::from("http"),
+            port: mock_server.address().port(),
+        };
+
+        // This should handle the error gracefully
+        // Note: The current Python script may not have sophisticated error handling,
+        // but this test documents the expected behavior
+        mattermost(&mm_config, true).await;
+    }
+
+    #[tokio::test]
+    async fn mattermost_team_not_found() {
+        let mock_server = MockServer::start().await;
+
+        // Mock GET /users/me to validate token
+        Mock::given(method(Method::GET))
+            .and(path("/api/v4/users/me"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "id": "user-id",
+                "username": "clubstatus"
+            })))
+            .expect(1)
+            .mount(&mock_server)
+            .await;
+
+        // Mock GET team by name to return 404
+        Mock::given(method(Method::GET))
+            .and(path("/api/v4/teams/name/section77"))
+            .respond_with(ResponseTemplate::new(404).set_body_json(json!({
+                "message": "Team not found"
+            })))
+            .expect(1)
+            .mount(&mock_server)
+            .await;
+
+        let mm_config = MatterMost {
+            python: String::from("../.venv/bin/python"),
+            enable: true,
+            url: mock_server.address().ip().to_string(),
+            loginid: String::from("clubstatus"),
+            apitoken: String::from("apitoken"),
+            scheme: String::from("http"),
+            port: mock_server.address().port(),
+        };
+
+        // This should handle the team not found error
+        mattermost(&mm_config, true).await;
+    }
+
+    #[tokio::test]
+    async fn mattermost_channel_not_found() {
+        let mock_server = MockServer::start().await;
+
+        // Mock GET /users/me to validate token
+        Mock::given(method(Method::GET))
+            .and(path("/api/v4/users/me"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "id": "user-id",
+                "username": "clubstatus"
+            })))
+            .expect(1)
+            .mount(&mock_server)
+            .await;
+
+        // Mock GET team by name
+        Mock::given(method(Method::GET))
+            .and(path("/api/v4/teams/name/section77"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "id": "team-id",
+                "name": "section77"
+            })))
+            .expect(1)
+            .mount(&mock_server)
+            .await;
+
+        // Mock GET channel by name to return 404
+        Mock::given(method(Method::GET))
+            .and(path("/api/v4/teams/team-id/channels/name/clubstatus"))
+            .respond_with(ResponseTemplate::new(404).set_body_json(json!({
+                "message": "Channel not found"
+            })))
+            .expect(1)
+            .mount(&mock_server)
+            .await;
+
+        let mm_config = MatterMost {
+            python: String::from("../.venv/bin/python"),
+            enable: true,
+            url: mock_server.address().ip().to_string(),
+            loginid: String::from("clubstatus"),
+            apitoken: String::from("apitoken"),
+            scheme: String::from("http"),
+            port: mock_server.address().port(),
+        };
+
+        // This should handle the channel not found error
+        mattermost(&mm_config, true).await;
     }
 }
