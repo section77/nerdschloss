@@ -21,37 +21,39 @@ use configuration::SpaceAPI;
 pub async fn spaceapi(configuration: &SpaceAPI, state: bool) {
     info!("SpaceAPI {state:?}");
 
-    if configuration.enable {
-        let status = if state {
-            String::from("open")
-        } else {
-            String::from("closed")
-        };
-
-        info!("Set SpaceAPI status");
-
-        let retry_policy = ExponentialBackoff::builder().build_with_max_retries(5);
-        let client = ClientBuilder::new(reqwest::Client::new())
-            .with(RetryTransientMiddleware::new_with_policy(retry_policy))
-            .build();
-
-        match client
-            .put(format!("{}?status={status}", configuration.url))
-            .basic_auth(
-                &configuration.username,
-                Some(&configuration.password.expose_secret()),
-            )
-            .send()
-            .await
-        {
-            Ok(_) => {
-                info!("Successfully set SpaceAPI status");
-            }
-            Err(e) => {
-                error!("Failed to set SpaceAPI status: {e:?}");
-            }
-        };
+    if !configuration.enable {
+        return;
     }
+
+    let status = if state {
+        String::from("open")
+    } else {
+        String::from("closed")
+    };
+
+    info!("Set SpaceAPI status");
+
+    let retry_policy = ExponentialBackoff::builder().build_with_max_retries(5);
+    let client = ClientBuilder::new(reqwest::Client::new())
+        .with(RetryTransientMiddleware::new_with_policy(retry_policy))
+        .build();
+
+    match client
+        .put(format!("{}?status={status}", configuration.url))
+        .basic_auth(
+            &configuration.username,
+            Some(&configuration.password.expose_secret()),
+        )
+        .send()
+        .await
+    {
+        Ok(_) => {
+            info!("Successfully set SpaceAPI status");
+        }
+        Err(e) => {
+            error!("Failed to set SpaceAPI status: {e:?}");
+        }
+    };
 }
 
 #[cfg(test)]
