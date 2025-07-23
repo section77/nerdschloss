@@ -29,42 +29,39 @@ pub fn run(configuration: &'static Configuration, direction: Direction) {
     println!("Hardware {direction:?}");
 
     // set motor direction
-    let mut motor_direction_gpio = Gpio::new()
+    let mut direction_gpio = Gpio::new()
         .unwrap()
-        .get(configuration.direction)
+        .get(configuration.directionpin)
         .unwrap()
         .into_output();
     match direction {
-        Direction::Open => motor_direction_gpio.set_high(),
-        Direction::Close => motor_direction_gpio.set_low(),
+        Direction::Open => direction_gpio.set_high(),
+        Direction::Close => direction_gpio.set_low(),
     }
 
-    let mut motor_gpio = Gpio::new()
+    let mut step_gpio = Gpio::new()
         .unwrap()
-        .get(configuration.pin)
-        .unwrap()
-        .into_output();
-    let mut motor_driver_gpio = Gpio::new()
-        .unwrap()
-        .get(configuration.driver)
+        .get(configuration.steppin)
         .unwrap()
         .into_output();
-
-    const STEPPS: i64 = 32000;
-    const PWM_SLEEP_TIME: u64 = 100;
+    let mut driverenable_gpio = Gpio::new()
+        .unwrap()
+        .get(configuration.driverenablepin)
+        .unwrap()
+        .into_output();
 
     println!("Start motor");
 
-    motor_driver_gpio.set_low();
+    driverenable_gpio.set_low();
 
-    for _ in 1..STEPPS {
-        motor_gpio.set_high();
-        std::thread::sleep(std::time::Duration::from_micros(PWM_SLEEP_TIME));
-        motor_gpio.set_low();
-        std::thread::sleep(std::time::Duration::from_micros(PWM_SLEEP_TIME));
+    for _ in 1..configuration.steps {
+        step_gpio.set_low();
+        std::thread::sleep(std::time::Duration::from_micros(configuration.pwmsleeptime));
+        step_gpio.set_high();
+        std::thread::sleep(std::time::Duration::from_micros(configuration.pwmsleeptime));
     }
 
-    motor_driver_gpio.set_high();
+    driverenable_gpio.set_high();
 
     println!("Stop motor");
 }

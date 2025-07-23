@@ -4,9 +4,11 @@ use crate::motor::{run, Direction};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Configuration {
-    pub pin: u8,
-    pub direction: u8,
-    pub driver: u8,
+    pub steps: u64,
+    pub pwmsleeptime: u64,
+    pub steppin: u8,
+    pub directionpin: u8,
+    pub driverenablepin: u8,
 }
 
 #[derive(Debug, Default, Clone, Copy)]
