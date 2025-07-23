@@ -55,4 +55,4 @@ reqwest-middleware = { version = "0.4", features = ["json"] }
 reqwest-tracing = "0.5"
 secrecy = { version = "0.10", features = ["serde"] }
 
-mattermost-rust-client = "4"
+# mattermost-rust-client = "4"
