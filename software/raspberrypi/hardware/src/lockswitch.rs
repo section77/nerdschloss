@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
     target_env = "musl",
     target_os = "linux"
 ))]
-use tracing::{debug, error};
+use tracing::{error, info};
 
 #[cfg(all(
     any(target_arch = "arm", target_arch = "aarch64"),
@@ -87,7 +87,7 @@ impl LockSwitch {
         let delay = std::time::Duration::from_millis(configuration.interruptdelay);
 
         gpio.set_async_interrupt(rppal::gpio::Trigger::Both, Some(delay), move |event| {
-            debug!("Interrupt LockSwitchState: {event:?}");
+            info!("Interrupt LockSwitchState: {event:?}");
             let state = match event.trigger {
                 Trigger::RisingEdge => true,
                 Trigger::FallingEdge => false,

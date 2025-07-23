@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
     target_env = "musl",
     target_os = "linux"
 ))]
-use tracing::debug;
+use tracing::info;
 
 #[cfg(all(
     any(target_arch = "arm", target_arch = "aarch64"),
@@ -84,7 +84,7 @@ impl DoorSwitch {
         let delay = std::time::Duration::from_millis(configuration.interruptdelay);
 
         gpio.set_async_interrupt(rppal::gpio::Trigger::Both, Some(delay), move |event| {
-            debug!("Interrupt DoorSwitchState: {event:?}");
+            info!("Interrupt DoorSwitchState: {event:?}");
         })
         .unwrap();
 
