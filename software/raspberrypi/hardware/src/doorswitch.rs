@@ -99,14 +99,14 @@ impl DoorSwitch {
         any(target_os = "macos", target_os = "linux"),
         not(target_env = "musl")
     ))]
-    pub fn new(_configuration: &'static Configuration) -> Self {
+    pub fn new(configuration: &'static Configuration) -> Self {
         Self::check_state_file();
 
         std::thread::spawn(move || {
             let (tx, rx) = std::sync::mpsc::channel();
 
             let mut debouncer = notify_debouncer_full::new_debouncer(
-                std::time::Duration::from_millis(10),
+                std::time::Duration::from_millis(configuration.interruptdelay),
                 None,
                 tx,
             )

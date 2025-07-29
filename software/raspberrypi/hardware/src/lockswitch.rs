@@ -112,7 +112,7 @@ impl LockSwitch {
         not(target_env = "musl")
     ))]
     pub fn new(
-        _configuration: &'static Configuration,
+        configuration: &'static Configuration,
         sender: tokio::sync::mpsc::Sender<bool>,
     ) -> Self {
         Self::check_state_file();
@@ -121,7 +121,7 @@ impl LockSwitch {
             let (tx, rx) = std::sync::mpsc::channel();
 
             let mut debouncer = notify_debouncer_full::new_debouncer(
-                std::time::Duration::from_millis(10),
+                std::time::Duration::from_millis(configuration.interruptdelay),
                 None,
                 tx,
             )
