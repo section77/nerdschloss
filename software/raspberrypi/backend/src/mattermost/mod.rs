@@ -118,7 +118,7 @@ pub async fn mattermost(configuration: &MatterMost, state: bool) {
     let code = std::include_str!("../../../backend/python/mattermost.py");
 
     #[allow(unused_variables)]
-    let output = match std::process::Command::new(&configuration.python)
+    let output = match tokio::process::Command::new(&configuration.python)
         .args([
             "-c",
             code,
@@ -130,6 +130,7 @@ pub async fn mattermost(configuration: &MatterMost, state: bool) {
             &state.to_string(),
         ])
         .output()
+        .await
     {
         Ok(output) => {
             info!("Successfully executed MatterMost Python script");
