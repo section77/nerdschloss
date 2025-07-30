@@ -5,7 +5,10 @@ use serde::Deserialize;
 
 use hardware::{doorswitch, lock, lockswitch};
 
-use crate::{mattermost::configuration::MatterMost, spaceapi::configuration::SpaceAPI};
+use crate::{
+    mattermost::configuration::MatterMost, mqtt::configuration::Mqtt,
+    spaceapi::configuration::SpaceAPI,
+};
 
 pub type ConfigurationRef = &'static Configuration;
 
@@ -19,9 +22,9 @@ pub struct Server {
 pub struct Configuration {
     pub server: Server,
 
-    pub spaceapi: SpaceAPI,
-
+    pub mqtt: Mqtt,
     pub mattermost: MatterMost,
+    pub spaceapi: SpaceAPI,
 
     // hardware
     pub lockmotor: lock::Configuration,

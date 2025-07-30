@@ -2,6 +2,7 @@ pub mod configuration;
 mod handlers;
 mod logic;
 mod mattermost;
+mod mqtt;
 mod notifyer;
 mod spaceapi;
 
