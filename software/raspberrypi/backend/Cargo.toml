@@ -60,7 +60,7 @@ secrecy = { version = "0.10", features = ["serde"] }
 
 # mattermost-rust-client = "4"
 
-rumqttc = "0.24"
+rumqttc = "0.25"
 retry-policies = "0.5"
 
 console-subscriber = "0.4"
