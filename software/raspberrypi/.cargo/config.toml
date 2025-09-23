@@ -1,17 +1,17 @@
 [build]
-#target = "arm-unknown-linux-musleabihf"
-#target = "armv7-unknown-linux-musleabihf"
-#target = "aarch64-unknown-linux-musl"
+rustflags = "--cfg tokio_unstable"
+# target = "arm-unknown-linux-musleabihf"
+# target = "armv7-unknown-linux-musleabihf"
+# target = "aarch64-unknown-linux-musl"
 
 [target.arm-unknown-linux-musleabihf]
 linker = "arm-linux-gnueabihf-ld"
-rustflags = "-C target-cpu=arm1176jzf-s"
+rustflags = "-C target-cpu=arm1176jzf-s --cfg tokio_unstable"
 
 [target.armv7-unknown-linux-musleabihf]
 linker = "arm-linux-gnueabihf-ld"
-rustflags = "-C target-cpu=cortex-a72"
+rustflags = "-C target-cpu=cortex-a72 --cfg tokio_unstable"
 
 [target.aarch64-unknown-linux-musl]
 linker = "aarch64-elf-ld"
-rustflags = "-C target-cpu=cortex-a72"
-
+rustflags = "-C target-cpu=cortex-a72 --cfg tokio_unstable"
