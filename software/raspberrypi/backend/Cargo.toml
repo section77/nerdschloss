@@ -19,7 +19,7 @@ fake = "4"
 serde_json = "1"
 secrecy = "0.10"
 wiremock = "0.6"
-rumqttd = "0.19"
+rumqttd = "0.20"
 
 [dependencies]
 hardware = { path = "../hardware" }
