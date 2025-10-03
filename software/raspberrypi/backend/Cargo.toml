@@ -54,13 +54,21 @@ reqwest = { version = "0.12", default-features = false, features = [
     "json",
 ] }
 reqwest-retry = "0.7"
-reqwest-middleware = { version = "0.4", features = ["json"] }
+reqwest-middleware = { version = "0.4", default-features = false, features = [
+    "rustls-tls",
+    "json",
+] }
 reqwest-tracing = "0.5"
 secrecy = { version = "0.10", features = ["serde"] }
 
 # mattermost-rust-client = "4"
 
-rumqttc = "0.25"
+# rumqttc = { version = "0.25", default-features = false, features = [
+#     "use-rustls-no-provider",
+# ] }
+rumqttc = { git = "https://github.com/bytebeamio/rumqtt", default-features = false, features = [
+    "use-rustls-no-provider",
+] }
 retry-policies = "0.5"
 
 console-subscriber = "0.4"
