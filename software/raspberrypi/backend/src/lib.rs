@@ -10,7 +10,10 @@ use anyhow::Result;
 use poem::{
     endpoint::EmbeddedFileEndpoint, get, listener::TcpListener, EndpointExt, Route, Server,
 };
-use tokio::sync::mpsc::{channel, Sender};
+use tokio::{
+    sync::mpsc::{channel, Sender},
+    task,
+};
 
 use self::{
     configuration::ConfigurationRef,
@@ -39,9 +42,13 @@ pub async fn run(configuration: ConfigurationRef) -> anyhow::Result<()> {
     let (spaceapi_sender, spaceapi_receiver) = channel(1);
     let (sender, receiver) = channel(1);
 
-    tokio::spawn(async move { logic(configuration, receiver, spaceapi_sender).await });
+    task::Builder::new()
+        .name("logic")
+        .spawn(async move { logic(configuration, receiver, spaceapi_sender).await })?;
 
-    tokio::spawn(async move { notifyer::notify(configuration, spaceapi_receiver).await });
+    task::Builder::new()
+        .name("notifier")
+        .spawn(async move { notifyer::notify(configuration, spaceapi_receiver).await })?;
 
     // Listen for new connections
     let listener = TcpListener::bind(std::net::SocketAddr::new(
