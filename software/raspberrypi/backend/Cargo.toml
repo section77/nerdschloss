@@ -24,15 +24,14 @@ rumqttd = "0.20"
 [dependencies]
 hardware = { path = "../hardware" }
 clap = { version = "4", features = ["derive", "cargo", "env", "unicode"] }
-clap-verbosity-flag = "3"
+clap-verbosity-flag = { version = "3", default-features = false, features = [
+    "tracing",
+] }
 dotenvy = "0.15"
 shadow-rs = "1"
 config = { version = "0.15", default-features = false, features = ["toml"] }
 tracing = "0.1"
-tracing-log = "0.2.0"
 tracing-subscriber = "0.3"
-tracing-oslog = "0.3"
-tracing-journald = "0.3"
 directories-next = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -72,3 +71,9 @@ rumqttc = { git = "https://github.com/bytebeamio/rumqtt", default-features = fal
 retry-policies = "0.5"
 
 console-subscriber = "0.4"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+tracing-journald = "0.3"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+tracing-oslog = "0.3"
