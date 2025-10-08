@@ -1,11 +1,11 @@
-use std::boxed::Box;
+use std::{boxed::Box, io::IsTerminal};
 
 use anyhow::{Error, Result};
 use clap::Parser;
+use clap_verbosity_flag::Verbosity;
 use shadow_rs::shadow;
 use tracing::instrument;
-use tracing_log::{AsTrace, LogTracer};
-use tracing_subscriber::FmtSubscriber;
+use tracing_subscriber::{fmt, prelude::*, util::SubscriberInitExt};
 
 use backend::{configuration, run};
 
@@ -22,10 +22,123 @@ struct Args {
     #[arg(short = 'b', long)]
     show_build_details: bool,
     #[command(flatten)]
-    verbose: clap_verbosity_flag::Verbosity,
+    verbose: Verbosity,
+    #[arg(long, env = "TOKIO_CONSOLE")]
+    tokio_console: bool,
+
     /// Enable the SpaceAPI
     #[arg(short, long)]
     spaceapi: bool,
+}
+
+fn init_tracing(verbosity: &Verbosity, enable_console: bool) -> Result<()> {
+    let is_interactive = std::io::stdout().is_terminal();
+    let level_filter = verbosity.tracing_level_filter();
+
+    // Helper to create the base registry with level filter
+    macro_rules! registry {
+        () => {
+            tracing_subscriber::registry().with(level_filter)
+        };
+    }
+
+    // Helper to create the interactive formatter
+    macro_rules! interactive_fmt {
+        () => {
+            fmt::layer().with_target(true).with_level(true)
+        };
+    }
+
+    match (enable_console, is_interactive) {
+        (true, true) => {
+            // Console + interactive stdout
+            registry!()
+                .with(console_subscriber::spawn())
+                .with(interactive_fmt!())
+                .init();
+            tracing::info!("Logging: tokio-console (port 6669) + stdout");
+        }
+        (true, false) => {
+            // Console + OS-specific
+            init_with_console(level_filter)?;
+        }
+        (false, true) => {
+            // Interactive stdout only
+            registry!().with(interactive_fmt!()).init();
+            tracing::info!("Logging: interactive mode (stdout)");
+        }
+        (false, false) => {
+            // OS-specific only
+            init_os_specific(level_filter)?;
+        }
+    }
+
+    Ok(())
+}
+
+#[cfg(target_os = "linux")]
+fn init_with_console(level_filter: tracing::level_filters::LevelFilter) -> Result<()> {
+    tracing_subscriber::registry()
+        .with(level_filter)
+        .with(console_subscriber::spawn())
+        .with(tracing_journald::layer()?)
+        .init();
+    tracing::info!("Logging: journald + tokio-console");
+    Ok(())
+}
+
+#[cfg(target_os = "macos")]
+fn init_with_console(level_filter: tracing::level_filters::LevelFilter) -> Result<()> {
+    let oslog = tracing_oslog::OsLogger::new("com.yourapp.identifier", "default");
+    tracing_subscriber::registry()
+        .with(level_filter)
+        .with(console_subscriber::spawn())
+        .with(oslog)
+        .init();
+    tracing::info!("Logging: oslog + tokio-console");
+    Ok(())
+}
+
+#[cfg(not(any(target_os = "linux", target_os = "macos")))]
+fn init_with_console(level_filter: tracing::level_filters::LevelFilter) -> Result<()> {
+    tracing_subscriber::registry()
+        .with(level_filter)
+        .with(console_subscriber::spawn())
+        .with(fmt::layer())
+        .init();
+    tracing::info!("Logging: fallback (stdout) + tokio-console");
+    Ok(())
+}
+
+#[cfg(target_os = "linux")]
+fn init_os_specific(level_filter: tracing::level_filters::LevelFilter) -> Result<()> {
+    tracing_subscriber::registry()
+        .with(level_filter)
+        .with(tracing_journald::layer()?)
+        .init();
+    tracing::info!("Logging: journald");
+    Ok(())
+}
+
+#[cfg(target_os = "macos")]
+fn init_os_specific(level_filter: tracing::level_filters::LevelFilter) -> Result<()> {
+    let oslog = tracing_oslog::OsLogger::new("com.yourapp.identifier", "default");
+    tracing_subscriber::registry()
+        .with(level_filter)
+        .with(oslog)
+        .init();
+    tracing::info!("Logging: oslog");
+    Ok(())
+}
+
+#[cfg(not(any(target_os = "linux", target_os = "macos")))]
+fn init_os_specific(level_filter: tracing::level_filters::LevelFilter) -> Result<()> {
+    tracing_subscriber::registry()
+        .with(level_filter)
+        .with(fmt::layer())
+        .init();
+    tracing::info!("Logging: fallback (stdout)");
+    Ok(())
 }
 
 fn load_configuration() -> Result<(configuration::ConfigurationRef, Args), Error> {
@@ -47,12 +160,7 @@ async fn main() -> Result<(), Error> {
     let (configuration, args) = load_configuration()?;
 
     // Setup logging
-    LogTracer::init()?;
-    let subscriber = FmtSubscriber::builder()
-        .with_max_level(args.verbose.log_level_filter().as_trace())
-        .finish();
-    tracing::subscriber::set_global_default(subscriber)
-        .expect("Setting default tracing subscriber failed");
+    init_tracing(&args.verbose, args.tokio_console)?;
 
     if args.show_config {
         dbg!(&configuration);

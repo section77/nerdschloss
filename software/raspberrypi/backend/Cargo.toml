@@ -19,19 +19,19 @@ fake = "4"
 serde_json = "1"
 secrecy = "0.10"
 wiremock = "0.6"
+rumqttd = "0.20"
 
 [dependencies]
 hardware = { path = "../hardware" }
 clap = { version = "4", features = ["derive", "cargo", "env", "unicode"] }
-clap-verbosity-flag = "3"
+clap-verbosity-flag = { version = "3", default-features = false, features = [
+    "tracing",
+] }
 dotenvy = "0.15"
 shadow-rs = "1"
 config = { version = "0.15", default-features = false, features = ["toml"] }
 tracing = "0.1"
-tracing-log = "0.2.0"
 tracing-subscriber = "0.3"
-tracing-oslog = "0.3"
-tracing-journald = "0.3"
 directories-next = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -39,7 +39,9 @@ anyhow = "1"
 thiserror = "2"
 rust-embed = "8"
 tokio = { version = "1", features = ["full", "tracing"] }
+#tokio-util = "0.7"
 futures = "0.3"
+#futures-util = "0.3"
 poem = { version = "3", features = [
     "static-files",
     "anyhow",
@@ -51,8 +53,27 @@ reqwest = { version = "0.12", default-features = false, features = [
     "json",
 ] }
 reqwest-retry = "0.7"
-reqwest-middleware = { version = "0.4", features = ["json"] }
+reqwest-middleware = { version = "0.4", default-features = false, features = [
+    "rustls-tls",
+    "json",
+] }
 reqwest-tracing = "0.5"
 secrecy = { version = "0.10", features = ["serde"] }
 
 # mattermost-rust-client = "4"
+
+# rumqttc = { version = "0.25", default-features = false, features = [
+#     "use-rustls-no-provider",
+# ] }
+rumqttc = { git = "https://github.com/bytebeamio/rumqtt", default-features = false, features = [
+    "use-rustls-no-provider",
+] }
+retry-policies = "0.5"
+
+console-subscriber = "0.4"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+tracing-journald = "0.3"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+tracing-oslog = "0.3"
